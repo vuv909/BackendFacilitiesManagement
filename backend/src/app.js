@@ -3,6 +3,8 @@ import compression from 'compression'
 import express from 'express'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import cors from 'cors'
+import router from './routes/index.js'
 import instanceMongoDb from './dbs/connect.mongodb.js'
 dotenv.config()
 const app = express()
@@ -13,10 +15,13 @@ app.use(helmet()) // khong bi lo minh dung phan mem gi
 app.use(compression()) //compression giup van chuyen giam bot mb
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cors({
+    origin: ["http://localhost:3000"],
+    methods: "GET, POST, PUT, DELETE, OPTIONS",
+}))
 
-
-//init router
-
+//init router 
+app.use(router);
 
 // handling catch error
 
