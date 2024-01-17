@@ -17,17 +17,16 @@ const login = async (credential) => {
             }
 
             const profile = verificationResponse?.payload;
-            console.log("profile", profile);
-            const existsInDB = userRepository.checkUserInDB(profile?.email);
-
+            userRepository.checkUserInDB(profile);
             return {
                 message: "Login was successful",
                 user: {
-                    firstName: profile?.given_name,
-                    lastName: profile?.family_name,
-                    picture: profile?.picture,
-                    email: profile?.email,
-                    token: jwt.sign({ email: profile?.email }, process.env.JWT_SECRET, {
+                    token: jwt.sign({
+                        email: profile?.email,
+                        name: profile?.name,
+                        avatar: profile?.picture
+                    },
+                        process.env.JWT_SECRET, {
                         expiresIn: "1d",
                     }),
                 },

@@ -8,10 +8,10 @@ const User = mongoose.model("User", new Schema(
             require: true
         },
         email: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Category'
+            type: String,
+            require: true,
         },
-        image: {
+        avatar: {
             type: String,
             require: true,
         },
@@ -20,10 +20,10 @@ const User = mongoose.model("User", new Schema(
             require: true,
             default: 1,
         },
-        location: {
-            type: String,
-            require: true,
-        },
+        address: {
+            type: String, 
+            require: false
+        }
     },
     {
         timestamps: true
