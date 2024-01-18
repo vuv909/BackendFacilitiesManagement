@@ -95,7 +95,6 @@ async function verifyGoogleToken(token) {
             idToken: token,
             audience: GOOGLE_CLIENT_ID,
         });
-        console.log(ticket);
         return { payload: ticket.getPayload() };
     } catch (error) {
         console.log(error.toString());
