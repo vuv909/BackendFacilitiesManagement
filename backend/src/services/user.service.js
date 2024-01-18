@@ -59,10 +59,9 @@ const FindOne = async (req) => {
 // cập nhật user profile 
 
 const UpdateOne = async (req) => {
-
-
+    const user = await FindOne(req);
     try {
-        if (id) {
+        if (user) {
             let user = await userRepository.UpdateOne(req);
             return user;
         }
