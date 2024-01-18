@@ -4,7 +4,6 @@ import { userRepository } from '../repositories/index.js';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
-let DB = [];
 
 const login = async (credential) => {
     try {
@@ -17,6 +16,11 @@ const login = async (credential) => {
             }
 
             const profile = verificationResponse?.payload;
+            if(!isEmailInDomain(profile?.email, 'fpt.edu.vn')){
+                return {
+                    message: "Only FPT University people can login to this system"
+                }
+            }
             userRepository.checkUserInDB(profile);
             return {
                 message: "Login was successful",
@@ -101,6 +105,12 @@ async function verifyGoogleToken(token) {
         return { error: "Invalid user detected. Please try again" };
     }
 }
+
+const isEmailInDomain = (email, domain) => {
+	const regex = new RegExp(`@${domain}$`, 'i'); // Case-insensitive regex for the domain
+	return regex.test(email);
+}
+
 
 export default {
     login, FindOne, UpdateOne, FindAll
