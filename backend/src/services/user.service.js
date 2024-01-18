@@ -40,6 +40,54 @@ const login = async (credential) => {
     }
 }
 
+// Tìm chi tiết User profile 
+const FindOne = async (req) => {
+    const { id } = req.params;
+
+    try {
+        if (id) {
+            let user = await userRepository.findUser(id);
+            return user;
+        }
+    } catch (error) {
+        return {
+            message: "Error",
+            content: error.toString()
+        }
+    }
+}
+// cập nhật user profile 
+
+const UpdateOne = async (req) => {
+
+
+    try {
+        if (id) {
+            let user = await userRepository.UpdateOne(req);
+            return user;
+        }
+    } catch (error) {
+        return {
+            message: "Error",
+            content: error.toString()
+        }
+    }
+}
+const FindAll = async (req) => {
+
+
+    try {
+        let user = await userRepository.FindAll(req);
+        console.log("hello user ");
+        return user;
+    } catch (error) {
+        return {
+            message: "Error",
+            content: error.toString()
+        }
+    }
+}
+
 async function verifyGoogleToken(token) {
     try {
         console.log(token);
@@ -56,5 +104,5 @@ async function verifyGoogleToken(token) {
 }
 
 export default {
-    login
+    login, FindOne, UpdateOne, FindAll
 }
