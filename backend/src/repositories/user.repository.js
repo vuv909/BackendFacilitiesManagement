@@ -12,7 +12,21 @@ const checkUserInDB = async (user) => {
     }
     return existedUser;
 }
+const findUser = async (id) => {
+    const existedUser = User.findById(id).exec();;
+
+    return existedUser;
+}
+const UpdateOne = async (req) => {
+    const { id } = req.params;
+    const existedUser = await User.findByIdAndUpdate(id, req.body, { new: true }).exec();
+    return existedUser;
+}
+const FindAll = async (req) => {
+    const existedUser = await User.find({}).exec();
+    return existedUser;
+}
 
 export default {
-    checkUserInDB
+    checkUserInDB, findUser, UpdateOne, FindAll
 }
