@@ -77,8 +77,6 @@ const UpdateOne = async (req) => {
     }
 }
 const FindAll = async (req) => {
-
-
     try {
         let user = await userRepository.FindAll(req);
         console.log("hello user ");

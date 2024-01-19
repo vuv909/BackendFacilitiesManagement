@@ -14,7 +14,16 @@ const create = async (req, res) => {
 }
 
 const update = async (req, res) => {
-    const { name, category, image, status, location, description } = req.body;
+    const facility = req.body;
+    try{
+        const result = await facilityService.update(facility);
+        res.status(200).json(result);
+    }catch(error){
+        return res.status(500).json({
+            statusCode: 0,
+            message: "System error"
+        })
+    }
 }
 
 const remove = async (req, res) => {

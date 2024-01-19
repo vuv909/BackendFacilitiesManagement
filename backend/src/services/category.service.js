@@ -1,4 +1,5 @@
 import Category from "../models/Category.js"
+import categoryRepository from "../repositories/category.repository.js";
 
 const create = async (name) => {
     try {
@@ -22,6 +23,16 @@ const create = async (name) => {
     }
 }
 
+const list = async () => {
+    try{
+       const listCategory = await categoryRepository.findAll();
+       return listCategory;
+    }catch(error){
+        return error.toString();
+    }
+}
+
 export default {
-    create
+    create,
+    list
 }
