@@ -7,14 +7,31 @@
     },
     "host": "localhost:5152",
     "basePath": "/",
+    "tag": [
+        {
+            "name": "user",
+            "description": "Everything about user"
+        },
+        {
+            "name": "facility",
+            "description": "Everything about facility"
+        },
+        {
+            "name": "category",
+            "description": "Everything about category"
+        }
+    ],
     "schemes": [
         "http"
     ],
     "paths": {
         "/users": {
             "get": {
+                "tags": [
+                    "user"
+                ],
                 "summary": "Returns a list of users.",
-                "description": "Optional extended description in Markdown.",
+                "description": "Optional extended description",
                 "produces": [
                     "application/json"
                 ],
@@ -22,6 +39,193 @@
                     "200": {
                         "description": "OK"
                     }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Return an user detail",
+                "description": "Get user detail data",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of user to get detail",
+                        "require": true,
+                        "type": "String"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get user detail"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update an user",
+                "description": "Update an user",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of user to get detail",
+                        "require": true,
+                        "type": "String"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User object that need to be update",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User updated"
+                    }
+                }
+            }
+        },
+        "/facility/create": {
+            "post": {
+                "tags": [
+                    "facility"
+                ],
+                "summary": "Create an facility",
+                "description": "Create new facility",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Facility object that need to be create",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/Facility"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Facility created"
+                    }
+                }
+            }
+        },
+        "/category/create": {
+            "post": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Create a category",
+                "description": "Create new category",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Name of category",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/Category"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category created"
+                    }
+                }
+            }
+        },
+        "/category/list": {
+            "get": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Get list category",
+                "description": "Get all category",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List faclities"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "User": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "address": {
+                    "type": "string"
+                }
+            }
+        },
+        "Facility": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        },
+        "Category": {
+            "type": "object",
+            "properties": {
+                "categoryName": {
+                    "type": "string"
                 }
             }
         }
