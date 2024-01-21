@@ -6,6 +6,7 @@ import morgan from 'morgan'
 import cors from 'cors'
 import router from './routes/index.js'
 import instanceMongoDb from './dbs/connect.mongodb.js'
+import { v2 as cloudinary } from 'cloudinary';
 dotenv.config()
 const app = express()
 
@@ -30,6 +31,14 @@ app.use((req, res, next) => {
     error.status = 404
     next(error)
 })
+
+// config cloudianry
+cloudinary.config({
+	cloud_name: process.env.CLOUD_NAME,
+	api_key: process.env.API_KEY,
+	api_secret: process.env.API_SECRET,
+	secure: true,
+});
 
 app.use((error, req, res, next) => {
     const statusCode = error.status || 500

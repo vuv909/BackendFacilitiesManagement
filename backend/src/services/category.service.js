@@ -32,7 +32,36 @@ const list = async () => {
     }
 }
 
+const update = async (id, name) => {
+    try {
+        const category = await categoryRepository.findOne(id);
+        category.categoryName = name;
+        await category.save();
+        return {
+            message: "Update successfully",
+            statusCode: 1
+        }
+    }catch(error){
+        return error.toString();
+    }
+}
+
+const remove = async (id) => {
+    try{
+        const deleteCategory = await categoryRepository.findAndDelete(id);
+        return {
+            message: "Remove successfully",
+            statusCode: 1,
+            content: deleteCategory
+        }
+    }catch(error) {
+        return error.toString();
+    }
+}
+
 export default {
     create,
-    list
+    list,
+    update,
+    remove
 }

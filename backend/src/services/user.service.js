@@ -17,9 +17,7 @@ const login = async (credential) => {
 
             const profile = verificationResponse?.payload;
             if(!isEmailInDomain(profile?.email, 'fpt.edu.vn')){
-                return {
-                    message: "Only FPT University people can login to this system"
-                }
+                throw new Error("Only FPT University people can login to this system");
             }
             userRepository.checkUserInDB(profile);
             return {
