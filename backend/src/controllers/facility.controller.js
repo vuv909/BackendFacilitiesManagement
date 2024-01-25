@@ -1,3 +1,4 @@
+import { validationResult } from "express-validator";
 import facilityService from "../services/facility.service.js";
 import fileService from "../services/file.service.js";
 

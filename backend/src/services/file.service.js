@@ -53,6 +53,12 @@ const uploadFile = async (req) => {
     });
 }
 
+const validateData = (data, ...key) => {
+    const body = data.body;
+    key.forEach(key => console.log(key))
+}
+
 export default {
-    uploadFile
+    uploadFile,
+    validateData
 }

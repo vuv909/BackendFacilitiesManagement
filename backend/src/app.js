@@ -11,9 +11,9 @@ dotenv.config()
 const app = express()
 
 // init middlewares
-// app.use(morgan("dev"))
-// app.use(helmet()) // khong bi lo minh dung phan mem gi
-// app.use(compression()) //compression giup van chuyen giam bot mb
+app.use(morgan("dev"))
+app.use(helmet()) // khong bi lo minh dung phan mem gi
+app.use(compression()) //compression giup van chuyen giam bot mb
 app.use(express.json())
 // app.use(express.urlencoded({ extended: true }))
 app.use(cors({
