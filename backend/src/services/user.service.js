@@ -17,14 +17,12 @@ const login = async (credential) => {
 
             const profile = verificationResponse?.payload;
             if(!isEmailInDomain(profile?.email, 'fpt.edu.vn')){
-                return {
-                    message: "Only FPT University people can login to this system"
-                }
+                throw new Error("Only FPT University people can login to this system");
             }
-            userRepository.checkUserInDB(profile);
+            const user = await userRepository.checkUserInDB(profile);
             return {
                 message: "Login was successful",
-                user: {
+                token: {
                     token: jwt.sign({
                         email: profile?.email,
                         name: profile?.name,
@@ -34,13 +32,11 @@ const login = async (credential) => {
                         expiresIn: "1d",
                     }),
                 },
+                user: user
             };
         }
     } catch (error) {
-        return {
-            message: "Error",
-            content: error.toString()
-        }
+        throw new Error(error.toString());
     }
 }
 
@@ -91,7 +87,6 @@ const FindAll = async (req) => {
 
 async function verifyGoogleToken(token) {
     try {
-        console.log(token);
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: GOOGLE_CLIENT_ID,

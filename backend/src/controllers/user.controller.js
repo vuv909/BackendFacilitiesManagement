@@ -7,8 +7,9 @@ const login = async (req, res) => {
         const response = await userService.login(credentital);
         return res.status(200).json(response);
     } catch (error) {
+        console.log("error", error.toString());
         return res.status(500).json({
-            message: error?.message || error,
+            error: error?.message || error.toString(),
         });
     }
 }

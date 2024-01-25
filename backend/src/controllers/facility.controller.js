@@ -1,15 +1,14 @@
+import { validationResult } from "express-validator";
 import facilityService from "../services/facility.service.js";
+import fileService from "../services/file.service.js";
 
 const create = async (req, res) => {
-    const facility = req.body;
+    const data = await fileService.uploadFile(req);
     try{
-        const result = await facilityService.create(facility);
+        const result = await facilityService.create(data);
         res.status(200).json(result);
     }catch(error){
-        return res.status(500).json({
-            statusCode: 0,
-            message: "System error"
-        })
+        return res.status(500).json(error)
     }
 }
 
@@ -19,10 +18,7 @@ const update = async (req, res) => {
         const result = await facilityService.update(facility);
         res.status(200).json(result);
     }catch(error){
-        return res.status(500).json({
-            statusCode: 0,
-            message: "System error"
-        })
+        return res.status(500).json(error)
     }
 }
 

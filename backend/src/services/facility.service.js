@@ -22,14 +22,15 @@ const update = async (facility) => {
     }
 }
 
-const create = async (facility) => {
+const create = async (data) => {
     try {
+        const facility = data.body;
+        if(data.urls){
+            facility.image = data.urls[0];
+        }
         const existedFacility = await Facility.find({ name: facility?.name });
         if (existedFacility && existedFacility.length > 0) {
-            return {
-                statusCode: 0,
-                message: "Already exsited facility"
-            }
+            throw new Error("Already exsited facility");
         }
         await Facility.create(facility);
         return {
@@ -37,10 +38,7 @@ const create = async (facility) => {
             message: "Created successfully"
         }
     } catch (error) {
-        return {
-            statusCode: 0,
-            message: "System error"
-        }
+        return error.toString();
     }
 }
 
