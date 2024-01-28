@@ -2,7 +2,7 @@ import multiparty from 'multiparty';
 import { v2 as cloudinary } from 'cloudinary'
 import util from 'util'
 
-const uploadFile = async (req) => {
+const uploadFile = async (req, attributeName) => {
     return new Promise((resolve, reject) => {
         const urls = [];
         const form = new multiparty.Form({ maxFieldsSize: "20MB" });
@@ -25,7 +25,7 @@ const uploadFile = async (req) => {
                 resultObject[field] = Array.isArray(fields[field]) ? fields[field][0] : fields[field];
             });
 
-            const filesData = files.file;
+            const filesData = files[attributeName];
             if(filesData != undefined){
                 for (let i = 0; i < filesData.length; i++) {
                     const imagePath = filesData[i].path;

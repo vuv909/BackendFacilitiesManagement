@@ -6,35 +6,49 @@ const create = async (name) => {
         const category = await Category.find({ categoryName: name });
         if (category && category.length > 0) {
             return {
-                code: 0,
+                statusCode: 0,
                 message: "Category type is already exsited"
             }
         }
         await Category.create({ categoryName: name });
         return {
-            code: 1,
+            statusCode: 1,
             message: "Success"
         }
     } catch (error) {
         return {
-            code: 0,
+            statusCode: 0,
             message: "System error!"
         }
     }
 }
 
-const list = async () => {
+const list = async (page, size, name) => {
+    const startIndex = (page - 1) * size;
+    const query = {
+		categoryName: { $regex: name, $options: 'i' }
+	};
+    console.log(query);
     try{
-       const listCategory = await categoryRepository.findAll();
-       return listCategory;
+       const listCategory = await categoryRepository.findPagination(startIndex, size, query);
+       console.log(listCategory);
+       return {
+            statusCode: 1,
+            message: "Success",
+            data: listCategory
+       };
     }catch(error){
-        return error.toString();
+        return {
+            statusCode: 0,
+            message: "System error!"
+        }
     }
 }
 
 const update = async (id, name) => {
     try {
-        const category = await categoryRepository.findOne(id);
+        const category = await categoryRepository.findOne({id});
+        console.log("category", category);
         category.categoryName = name;
         await category.save();
         return {
@@ -42,7 +56,10 @@ const update = async (id, name) => {
             statusCode: 1
         }
     }catch(error){
-        return error.toString();
+        return {
+            statusCode: 0,
+            message: "System error!"
+        }
     }
 }
 
@@ -55,7 +72,10 @@ const remove = async (id) => {
             content: deleteCategory
         }
     }catch(error) {
-        return error.toString();
+        return {
+            statusCode: 0,
+            message: "System error!"
+        }
     }
 }
 

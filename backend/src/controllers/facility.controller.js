@@ -3,38 +3,60 @@ import facilityService from "../services/facility.service.js";
 import fileService from "../services/file.service.js";
 
 const create = async (req, res) => {
-    const data = await fileService.uploadFile(req);
+    const data = await fileService.uploadFile(req, "img");
     try{
         const result = await facilityService.create(data);
-        res.status(200).json(result);
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
     }catch(error){
         return res.status(500).json(error)
     }
 }
 
 const update = async (req, res) => {
-    const facility = req.body;
+    const data = await fileService.uploadFile(req, "img");
     try{
-        const result = await facilityService.update(facility);
-        res.status(200).json(result);
+        const result = await facilityService.update(data);
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
     }catch(error){
         return res.status(500).json(error)
     }
 }
 
 const remove = async (req, res) => {
-	const { facilityId } = req.query;
+	const { id } = req.query;
+    try{
+        const result = await facilityService.remove(id);
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    }catch(error){
+        return res.status(500).json(error);
+    }
 }
 
 const detail = async (req, res) => {
 	const { id } = req.params;
+    try{
+        const result = await facilityService.detail(id);
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    }catch(error){
+        return res.status(500).json(error);
+    }
 }
 
 const listPagination = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
-    const name = req.query.facilityName || '';
-    const status = parseInt(req.query.status) || null;
+    const name = req.query.name || '';
+    try{
+        const result = await facilityService.listPagination(page, size, name);
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    }catch(error){
+        return res.status(500).json(error);
+    }
 }
 
 export default {

@@ -1,40 +1,56 @@
+import { validationResult } from "express-validator";
 import categoryService from "../services/category.service.js";
 
 const create = async (req, res) => {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+        return res.status(400).json(error);
+    }
     const { categoryName } = req.body;
     try {
         const result = await categoryService.create(categoryName);
-        return res.status(201).json(result);
-    }catch(error){
+        const statusCode = result.statusCode == 1 ? 201 : 500;
+        return res.status(statusCode).json(result);
+    } catch (error) {
         return res.status(500).json(error)
     }
 }
 
 const list = async (req, res) => {
-    try{
-        const result = await categoryService.list();
-        return res.status(200).json(result);
-    }catch(error) {
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 5;
+    const name = req.query.name || '';
+    try {
+        const result = await categoryService.list(page, size, name);
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    } catch (error) {
         return res.status(500).json(error);
     }
 }
 
 const update = async (req, res) => {
-    try{
-        const {id, categoryName} = req.body;
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+        return res.status(400).json(error);
+    }
+    const { id, categoryName } = req.body;
+    try {
         const result = await categoryService.update(id, categoryName);
-        return res.status(200).json(result);
-    }catch(error) {
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    } catch (error) {
         return res.status(500).json(error);
     }
 }
 
-const remvove = async (req, res) => {
-    try{
-        const id = req.query;
+const remove = async (req, res) => {
+    const {id} = req.query;
+    try {
         const result = await categoryService.remove(id);
-        return res.status(200).json(result);
-    }catch(error){
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    } catch (error) {
         return res.status(500).json(error);
     }
 }
@@ -43,5 +59,5 @@ export default {
     create,
     list,
     update,
-    remvove
+    remove
 }
