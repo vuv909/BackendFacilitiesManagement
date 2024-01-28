@@ -24,9 +24,15 @@ const findAndDelete = async (id) => {
     }
 }
 
+const findPagination = async (startIndex, size, query) => {
+    const listCategory = await Category.find(query).skip(startIndex).limit(size);
+    return listCategory;
+}
+
 export default { 
     findAll,
     findOne,
     findByCondition,
-    findAndDelete
+    findAndDelete,
+    findPagination
 }

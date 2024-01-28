@@ -5,6 +5,24 @@ const findAll = async () => {
     return listFacility;
 }
 
+const findOne = async (object) => {
+    const facility = await Facility.findOne(object).exec();
+    return facility;
+}
+
+const findFacility = async (id) => {
+    const facility = await Facility.findById(id).exec()
+    return facility;
+}
+
+const findPagination = async (startIndex, size, query) => {
+    const listFacility = await Facility.find(query).skip(startIndex).limit(size);
+    return listFacility;
+}
+
 export default {
-    findAll
+    findAll,
+    findOne,
+    findPagination,
+    findFacility
 }
