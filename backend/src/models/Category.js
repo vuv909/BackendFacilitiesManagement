@@ -6,7 +6,11 @@ const Category = mongoose.model("Category", new Schema(
 		categoryName: {
             type: String,
             require: true
-        }
+        },
+		image: {
+			type: String, 
+			require: false
+		}
 	},
 	{
 		timestamps: true

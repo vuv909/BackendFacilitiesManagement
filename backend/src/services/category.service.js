@@ -1,19 +1,24 @@
 import Category from "../models/Category.js"
 import categoryRepository from "../repositories/category.repository.js";
 
-const create = async (name) => {
+const create = async (data) => {
     try {
-        const category = await Category.find({ categoryName: name });
-        if (category && category.length > 0) {
+        const category = data.body;
+        if (data.urls) {
+            category.image = data.urls[0];
+        }
+        const exsitedCategory = await Category.find({ categoryName: category.categoryName });
+        if (exsitedCategory && exsitedCategory.length > 0) {
             return {
                 statusCode: 0,
                 message: "Category type is already exsited"
             }
         }
-        await Category.create({ categoryName: name });
+        const newCategory = await Category.create(category);
         return {
             statusCode: 1,
-            message: "Success"
+            message: "Success",
+            data: newCategory
         }
     } catch (error) {
         return {
@@ -45,15 +50,20 @@ const list = async (page, size, name) => {
     }
 }
 
-const update = async (id, name) => {
+const update = async (data) => {
     try {
-        const category = await categoryRepository.findOne({id});
-        console.log("category", category);
-        category.categoryName = name;
-        await category.save();
+        const category = data.body;
+        if (data.urls) {
+            category.image = data.urls[0];
+        }
+        const categoryUpdate = await categoryRepository.findOne({_id: category.id});
+        categoryUpdate.categoryName = category.categoryName;
+        categoryUpdate.image = category.image;
+        await categoryUpdate.save();
         return {
             message: "Update successfully",
-            statusCode: 1
+            statusCode: 1,
+            data: categoryUpdate
         }
     }catch(error){
         return {

@@ -5,8 +5,8 @@ const findAll = async () => {
     return listCategory;
 }
 
-const findOne = async(id) => {
-    const category = await Category.findOne({id}).exec();
+const findOne = async(object) => {
+    const category = await Category.findOne(object).exec();
     return category;
 }
 

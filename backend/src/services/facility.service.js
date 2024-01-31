@@ -33,7 +33,6 @@ const update = async (data) => {
         facility.image = data.urls[0];
     }
     try {
-        console.log(facility, "facility");
         const existedFacility = await Facility.findById(facility?.id);
         if (!existedFacility || existedFacility.length <= 0) {
             return {
