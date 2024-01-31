@@ -2,7 +2,7 @@ import multiparty from 'multiparty';
 import { v2 as cloudinary } from 'cloudinary'
 import util from 'util'
 
-const uploadFile = async (req, attributeName) => {
+const uploadFile = async (req, attributeName, validateObject ) => {
     return new Promise((resolve, reject) => {
         const urls = [];
         const form = new multiparty.Form({ maxFieldsSize: "20MB" });
@@ -19,11 +19,22 @@ const uploadFile = async (req, attributeName) => {
             };
 
             const resultObject = {}
-
-            Object.keys(fields).forEach(field => {
+            const errors = []
+            Object.keys(fields).forEach((field) => {
                 // Use the first element if it's an array, otherwise use the value as is
-                resultObject[field] = Array.isArray(fields[field]) ? fields[field][0] : fields[field];
+                const fieldValue = Array.isArray(fields[field]) ? fields[field][0] : fields[field];
+                resultObject[field] = fieldValue;
+                const error = validateData(fieldValue, validateObject[field], field);
+                if(error != undefined && !error){
+                    errors.push(error);
+                }
             });
+            
+            if(errors.length > 0){
+                resolve({
+                    errors
+                })
+            }
 
             const filesData = files[attributeName];
             if(filesData != undefined){
@@ -53,10 +64,29 @@ const uploadFile = async (req, attributeName) => {
     });
 }
 
-const validateData = (data, ...key) => {
-    const body = data.body;
-    key.forEach(key => console.log(key))
+function validateData(data, validateCondition, fieldName) {
+    const errors = [];
+
+    if (!validateCondition) {
+        return errors;
+    }
+    
+    for (const key of Object.keys(validateCondition)) {
+        if (key === "isEmpty" && !validateCondition[key]) {
+            if (!data || data.length < 1) {
+                const error = {
+                    field: fieldName,
+                    msg: `${fieldName} can not be empty`
+                };
+                console.log(error);
+                errors.push(error); // Push error object to the errors array
+            }
+        }
+    }
+
+    return errors; // Return the array of errors
 }
+
 
 export default {
     uploadFile,

@@ -1,14 +1,13 @@
-import { validationResult } from "express-validator";
-import categoryService from "../services/category.service.js";
+import { categoryService, fileService } from "../services/index.js";
 
 const create = async (req, res) => {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-        return res.status(400).json(error);
-    }
-    const { categoryName } = req.body;
+    const data = await fileService.uploadFile(req, "img", {
+        categoryName: {
+            isEmpty: false,
+        }
+    });
     try {
-        const result = await categoryService.create(categoryName);
+        const result = await categoryService.create(data);
         const statusCode = result.statusCode == 1 ? 201 : 500;
         return res.status(statusCode).json(result);
     } catch (error) {
@@ -30,13 +29,9 @@ const list = async (req, res) => {
 }
 
 const update = async (req, res) => {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-        return res.status(400).json(error);
-    }
-    const { id, categoryName } = req.body;
+    const data = await fileService.uploadFile(req, "img");
     try {
-        const result = await categoryService.update(id, categoryName);
+        const result = await categoryService.update(data);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     } catch (error) {
