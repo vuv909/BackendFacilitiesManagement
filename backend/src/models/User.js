@@ -1,33 +1,40 @@
-import mongoose, { ObjectId, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const User = mongoose.model("User", new Schema(
+const UserSchema = new Schema(
     {
-        id: ObjectId,
+        id: mongoose.Schema.Types.ObjectId,
+        roleId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Role",
+            required: false,
+        },
         name: {
             type: String,
-            require: true
+            required: true
         },
         email: {
             type: String,
-            require: true,
+            required: true,
         },
         avatar: {
             type: String,
-            require: true,
+            required: true,
         },
         status: {
             type: Number,
-            require: true,
+            required: true,
             default: 1,
         },
         address: {
-            type: String, 
-            require: false
+            type: String,
+            required: false
         }
     },
     {
         timestamps: true
     }
-))
+);
+
+const User = mongoose.model("User", UserSchema);
 
 export default User;
