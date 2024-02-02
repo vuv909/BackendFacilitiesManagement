@@ -4,19 +4,11 @@ import bookingRepository from '../repositories/booking.repository.js'
 
 const update = async (req) => {
 
-    const { id } = req.params;
     try {
-        // const existedbooking = await booking.find({ name: booking?.id });
-        // if (!existedbooking || existedbooking.length <= 0) {
-        //     return {
-        //         statusCode: 0,
-        //         message: "booking not existed"
-        //     }
-        // }
-        // await existedbooking.save();
-        await Booking.findByIdAndUpdate(id, req.body, { new: true }).exec();
+        const result = await bookingRepository.UpdateOne(req);
         return {
-            statusCode: 1,
+            statusCode: 200,
+            result: result,
             message: "Updated successfully"
         }
     } catch (error) {
@@ -29,11 +21,12 @@ const update = async (req) => {
 
 const deleteOne = async (req) => {
 
-    const { id } = req.params;
+
     try {
-        await Booking.deleteOne({ _id: id }).exec();
+        const result = await bookingRepository.DeleteOne(req);
         return {
             statusCode: 1,
+            result: result,
             message: "Delete successfully"
         }
     } catch (error) {
@@ -45,9 +38,8 @@ const deleteOne = async (req) => {
 }
 const detail = async (req) => {
 
-    const { id } = req.params;
     try {
-        const result = await Booking.findById(id).exec();
+        const result = await bookingRepository.FindBooking(req);
         return {
             statusCode: 200,
             data: result,
@@ -62,18 +54,10 @@ const detail = async (req) => {
 
 const create = async (req) => {
     try {
-        console.log("Day là create ", req.body)
-        // const existedbooking = await booking.find({ name: booking?.name });
-        // if (existedbooking && existedbooking.length > 0) {
-        //     return {
-        //         statusCode: 0,
-        //         message: "Already exsited booking"
-        //     }
-        // }
-        const result = await Booking.create(req.body);
-        console.log(result);
+        const result = await bookingRepository.CreateOne(req);
         return {
             statusCode: 1,
+            result: result,
             message: "Created successfully"
         }
     } catch (error) {

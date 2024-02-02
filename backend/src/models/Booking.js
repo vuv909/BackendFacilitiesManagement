@@ -1,17 +1,16 @@
-import mongoose, { ObjectId, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const Booking = mongoose.model("Booking", new Schema(
+const BookingSchema = new Schema(
     {
-        id: ObjectId,
         booker: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: false,
+            required: true,
         },
         facilityId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: false,
+            ref: "Facility",
+            required: true,
         },
         handler: {
             type: mongoose.Schema.Types.ObjectId,
@@ -20,30 +19,33 @@ const Booking = mongoose.model("Booking", new Schema(
         },
         startDate: {
             type: Date,
-            require: true
+            required: true,
         },
         endDate: {
             type: Date,
-            require: true
+            required: true,
         },
         slot: {
             type: String,
-            require: true
+            required: true,
         },
         status: {
             type: Number,
-            require: true
+            required: true,
         },
         createdBy: {
             type: String,
+            required: true,
         },
         modifiedBy: {
             type: String,
         },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
-))
+);
+
+const Booking = mongoose.model("Booking", BookingSchema);
 
 export default Booking;

@@ -1,0 +1,15 @@
+import express from 'express';
+import { roleController } from '../controllers/index.js';
+
+const roleRouter = express.Router();
+
+// view list role
+
+roleRouter.get("/", roleController.FindAll);
+// view role profile
+// created by: quốc khánh 
+roleRouter.get("/:id", roleController.FindOne);
+
+// Update role profile 
+roleRouter.put("/:id", roleController.UpdateOne);
+export default roleRouter;
