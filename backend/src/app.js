@@ -5,7 +5,6 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import cors from 'cors'
 import router from './routes/index.js'
-import instanceMongoDb from './dbs/connect.mongodb.js'
 import { v2 as cloudinary } from 'cloudinary';
 dotenv.config()
 const app = express()

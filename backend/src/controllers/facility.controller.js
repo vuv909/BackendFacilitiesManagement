@@ -15,9 +15,10 @@ const create = async (req, res) => {
 }
 
 const update = async (req, res) => {
-    const data = await fileService.uploadFile(req, "img");
+    const data = req.body;
     try{
-        const result = await facilityService.update(data);
+        const imageResult = await fileService.uploadFile(data);
+        const result = await facilityService.update(data, imageResult);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     }catch(error){
