@@ -4,8 +4,6 @@ import { userController } from '../controllers/index.js';
 const userRouter = express.Router();
 
 userRouter.post("/login", userController.login);
-
-
 // view list user
 
 userRouter.get("/", userController.FindAll);
