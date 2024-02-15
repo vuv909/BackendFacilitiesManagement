@@ -1,11 +1,16 @@
 import Category from "../models/Category.js"
 import categoryRepository from "../repositories/category.repository.js";
 
-const create = async (data) => {
+const create = async (data, imageResult) => {
     try {
-        const category = data.body;
-        if (data.urls) {
-            category.image = data.urls[0];
+        const category = data;
+        if (imageResult.statusCode == 1 && imageResult.urls) {
+            category.image = imageResult.urls[0];
+        }else {
+            return {
+                statusCode: 0,
+                message: "Error when upload image"
+            }
         }
         const exsitedCategory = await Category.find({ categoryName: category.categoryName });
         if (exsitedCategory && exsitedCategory.length > 0) {
@@ -33,10 +38,8 @@ const list = async (page, size, name) => {
     const query = {
 		categoryName: { $regex: name, $options: 'i' }
 	};
-    console.log(query);
     try{
        const listCategory = await categoryRepository.findPagination(startIndex, size, query);
-       console.log(listCategory);
        return {
             statusCode: 1,
             message: "Success",
@@ -50,11 +53,16 @@ const list = async (page, size, name) => {
     }
 }
 
-const update = async (data) => {
+const update = async (data, imageResult) => {
     try {
-        const category = data.body;
-        if (data.urls) {
-            category.image = data.urls[0];
+        const category = data;
+        if (imageResult.statusCode == 1 && imageResult.urls) {
+            category.image = imageResult.urls[0];
+        }else {
+            return {
+                statusCode: 0,
+                message: "Error when upload image"
+            }
         }
         const categoryUpdate = await categoryRepository.findOne({_id: category.id});
         categoryUpdate.categoryName = category.categoryName;

@@ -1,11 +1,16 @@
 import Facility from "../models/Facility.js"
 import facilityRepository from "../repositories/facility.repository.js";
 
-const create = async (data) => {
+const create = async (data, imageResult) => {
     try {
-        const facility = data.body;
-        if (data.urls) {
-            facility.image = data.urls[0];
+        const facility = data;
+        if (imageResult.statusCode == 1 && imageResult.urls) {
+            facility.image = imageResult.urls[0];
+        } else {
+            return {
+                statusCode: 0,
+                message: "Error when upload image"
+            }
         }
         const existedFacility = await Facility.find({ name: facility?.name });
         if (existedFacility && existedFacility.length > 0) {
@@ -27,9 +32,9 @@ const create = async (data) => {
         }
     }
 }
-const update = async (data) => {
-    const facility = data.body;
-    if (data.urls) {
+const update = async (data, imageResult) => {
+    const facility = data;
+    if (imageResult.statusCode == 1 && imageResult.urls) {
         facility.image = data.urls[0];
     }
     try {
@@ -63,7 +68,7 @@ const update = async (data) => {
 const remove = async (id) => {
     try {
         const facilityDelete = await Facility.findByIdAndDelete(id);
-        if(!facilityDelete){
+        if (!facilityDelete) {
             return {
                 statusCode: 0,
                 message: "Not found record"
@@ -85,7 +90,7 @@ const remove = async (id) => {
 const detail = async (id) => {
     try {
         const facility = await facilityRepository.findFacility(id);
-        if(!facility){
+        if (!facility) {
             return {
                 statusCode: 0,
                 message: "Not found record"
