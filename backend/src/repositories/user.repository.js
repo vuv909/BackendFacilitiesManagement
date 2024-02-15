@@ -13,9 +13,18 @@ const checkUserInDB = async (user) => {
     return existedUser;
 }
 const findUser = async (id) => {
-    const existedUser = User.findById(id).exec();;
-
-    return existedUser;
+    try {
+        const userProjecttion = {
+            createdAt: 0,
+            updatedAt: 0,
+            id: 0
+        }
+        const existedUser = await User.findById(id, userProjecttion).populate({ path: "roleId", select: userProjecttion }).exec();
+        return existedUser;
+    } catch (error) {
+        console.error("Error finding user:", error);
+        throw error;
+    }
 }
 const UpdateOne = async (req) => {
     const { id } = req.params;
@@ -23,7 +32,12 @@ const UpdateOne = async (req) => {
     return existedUser;
 }
 const FindAll = async (req) => {
-    const existedUser = await User.find({}).exec();
+    const userProjecttion = {
+        createdAt: 0,
+        updatedAt: 0,
+        id: 0
+    }
+    const existedUser = await User.find({}, userProjecttion).populate({ path: "roleId", select: userProjecttion }).exec();
     return existedUser;
 }
 
