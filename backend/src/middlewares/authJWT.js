@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 
 const verifyToken = async (req, res, next) => {
-	let token = req.headers["x-access-token"];
+	let token = req.headers.authorization
+	token = token.split('Bearer ')[1];
+	console.log(token);
 	if (!token) {
 		return res.status(403).send({ message: "No token provide!" });
 	}

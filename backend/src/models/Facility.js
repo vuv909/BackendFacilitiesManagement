@@ -27,8 +27,14 @@ const Facility = mongoose.model("Facility", new Schema(
         description: {
             type: String,
             require: false
+        },
+        modifiedBy: {
+            type: String,
+        },
+        createdBy: {
+            type: String, 
+            require: true
         }
-
 	},
 	{
 		timestamps: true
