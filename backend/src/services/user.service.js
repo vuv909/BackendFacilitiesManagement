@@ -27,7 +27,8 @@ const login = async (credential) => {
                         email: profile?.email,
                         name: profile?.name,
                         avatar: profile?.picture,
-                        id: user._id
+                        id: user._id,
+                        role: user.roleId
                     },
                         process.env.JWT_SECRET, {
                         expiresIn: "1d",

@@ -16,4 +16,4 @@ router.use("/category", categoryRouter)
 router.use("/booking", bookingRouter)
 router.use("/role", roleRouter)
 
-export default router;
+export default router; 

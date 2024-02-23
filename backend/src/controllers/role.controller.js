@@ -30,7 +30,6 @@ const FindAll = async (req, res) => {
 
     try {
         const response = await roleService.FindAll();
-
         return res.status(200).json(response);
     } catch (error) {
         return res.status(500).json({
@@ -39,6 +38,19 @@ const FindAll = async (req, res) => {
     }
 }
 
+const create = async (req, res ) => {
+    try{
+        const response = await roleService.create(req);
+        const statusCode = response.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(response);
+    }catch(error) {
+        return res.status(500).json({
+            message: error?.message || error,
+        })
+    }
+    
+}
+
 export default {
-    FindOne, UpdateOne, FindAll
+    FindOne, UpdateOne, FindAll, create
 }
