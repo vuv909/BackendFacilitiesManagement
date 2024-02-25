@@ -119,7 +119,9 @@ const listPagination = async (page, size, name) => {
         return {
             statusCode: 1,
             message: "Get data successfully",
-            data: listFacility
+            items: listFacility.items,
+            totalPage: Math.ceil(listFacility.total/size),
+            activePage: page
         }
     } catch (error) {
         return {

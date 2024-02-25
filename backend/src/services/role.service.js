@@ -78,6 +78,23 @@ const findRoleByName = async(name) => {
         }
     }
 }
+
+const initBaseRole = async() => {
+    try{
+        const baseRole = await roleRepository.checkBaseRole();
+        return {
+            statusCode: 1,
+            message: "Success",
+            content: baseRole
+        }
+    }catch(error){
+        return {
+            statusCode: 0,
+            message: "Error",
+            content: error.toString()
+        }
+    }
+}
 export default {
-    FindOne, UpdateOne, FindAll, create, findRoleByName
+    FindOne, UpdateOne, FindAll, create, findRoleByName, initBaseRole
 }

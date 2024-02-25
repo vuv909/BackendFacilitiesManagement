@@ -26,7 +26,11 @@ const findAndDelete = async (id) => {
 
 const findPagination = async (startIndex, size, query) => {
     const listCategory = await Category.find(query).skip(startIndex).limit(size);
-    return listCategory;
+    const totalPage = await Category.countDocuments();
+    return {
+        items: listCategory,
+        total: totalPage
+    };
 }
 
 export default { 

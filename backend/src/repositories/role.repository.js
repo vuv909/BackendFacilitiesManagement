@@ -30,6 +30,18 @@ const findRoleByName = async (roleName) => {
     return role;
 }
 
+const checkBaseRole = async () => {
+    const adminRole = await Role.findOne({roleName: "Admin"})
+    const studentRole = await Role.findOne({roleName: "Student"})
+    if(!adminRole){
+        await Role.create({roleName: "Admin", status: 1});
+    }
+    if(!studentRole){
+        await Role.create({roleName: "Student", status: 1});
+    }
+    
+}
+
 export default {
-    findRole, UpdateOne, FindAll, create, findRoleByName
+    findRole, UpdateOne, FindAll, create, findRoleByName, checkBaseRole
 }
