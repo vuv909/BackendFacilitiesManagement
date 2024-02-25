@@ -52,6 +52,19 @@ const detail = async (req, res) => {
     }
 
 }
+
+const FindBoookinUser = async (req, res) => {
+    try {
+        const result = await bookingService.FindBoookinUser(req);
+        res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({
+            statusCode: 0,
+            message: "System error"
+        })
+    }
+
+}
 const statusBooking = async (req, res) => {
     try {
         const result = await bookingService.statusBooking(req);
@@ -87,5 +100,5 @@ export default {
     update,
     remove,
     detail,
-    listPagination, statusBooking
+    listPagination, statusBooking, FindBoookinUser
 }
