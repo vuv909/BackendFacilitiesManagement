@@ -52,6 +52,18 @@ const detail = async (req, res) => {
     }
 
 }
+const statusBooking = async (req, res) => {
+    try {
+        const result = await bookingService.statusBooking(req);
+        res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({
+            statusCode: 0,
+            message: "System error"
+        })
+    }
+
+}
 
 const listPagination = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -75,5 +87,5 @@ export default {
     update,
     remove,
     detail,
-    listPagination
+    listPagination, statusBooking
 }
