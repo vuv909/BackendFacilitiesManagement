@@ -43,6 +43,41 @@ const FindAll = async (req) => {
         }
     }
 }
+
+const create = async (req) => {
+    try{
+        const {roleName} = req.body;
+        const newRole = await roleRepository.create(roleName);
+        return {
+            statusCode: 1,
+            message: "Success",
+            content: newRole
+        };
+    }catch(error){
+        return {
+            statusCode: 0,
+            message: "Error",
+            content: error.toString()
+        }
+    }
+}
+
+const findRoleByName = async(name) => {
+    try{
+        const role = await roleRepository.findRoleByName(name);
+        return {
+            statusCode: 1,
+            message: "Success",
+            content: role,
+        }
+    }catch(error){
+        return {
+            statusCode: 0,
+            message: "Error",
+            content: error.toString()
+        }
+    }
+}
 export default {
-    FindOne, UpdateOne, FindAll
+    FindOne, UpdateOne, FindAll, create, findRoleByName
 }

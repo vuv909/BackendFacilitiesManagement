@@ -12,4 +12,7 @@ roleRouter.get("/:id", roleController.FindOne);
 
 // Update role profile 
 roleRouter.put("/:id", roleController.UpdateOne);
+
+// Create new role
+roleRouter.post("/create", roleController.create);
 export default roleRouter;

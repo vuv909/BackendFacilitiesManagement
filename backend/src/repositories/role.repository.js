@@ -20,6 +20,16 @@ const FindAll = async (req) => {
     return existedRole;
 }
 
+const create = async (roleName) => {
+    const newRole = await Role.create({roleName, status: 1});
+    return newRole;
+}
+
+const findRoleByName = async (roleName) => {
+    const role = await Role.findOne({roleName});
+    return role;
+}
+
 export default {
-    findRole, UpdateOne, FindAll
+    findRole, UpdateOne, FindAll, create, findRoleByName
 }

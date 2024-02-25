@@ -26,7 +26,9 @@ const login = async (credential) => {
                     token: jwt.sign({
                         email: profile?.email,
                         name: profile?.name,
-                        avatar: profile?.picture
+                        avatar: profile?.picture,
+                        id: user._id,
+                        role: user.roleId
                     },
                         process.env.JWT_SECRET, {
                         expiresIn: "1d",

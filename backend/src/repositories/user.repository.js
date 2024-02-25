@@ -1,16 +1,24 @@
 import User from "../models/User.js"
+import { roleService } from "../services/index.js";
 
 const checkUserInDB = async (user) => {
     const existedUser = await User.findOne({ email: user.email });
+    const response = await roleService.findRoleByName("Student");
+    const role = response.content;
     if (!existedUser) {
         const newUser = await User.create({
             email: user.email,
             name: user.name,
-            avatara: user.picture
+            avatar: user.picture,
+            status: 1,
+            roleId: role._id
         });
-        return newUser;
+        return newUser.populate({path: 'roleId', select: "roleName"});
+    }else{
+        existedUser.roleId = role._id;
+        await existedUser.save();
     }
-    return existedUser;
+    return existedUser.populate({path: 'roleId', select: "roleName"});
 }
 const findUser = async (id) => {
     try {
