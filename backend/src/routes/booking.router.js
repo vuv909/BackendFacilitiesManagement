@@ -5,7 +5,10 @@ const bookingRouter = express.Router();
 
 bookingRouter.post("/", bookingController.create);
 bookingRouter.get("/", bookingController.listPagination);
+bookingRouter.get("/status", bookingController.statusBooking);
+
 bookingRouter.get("/:id", bookingController.detail);
+bookingRouter.get("/user/:id", bookingController.FindBoookinUser);
 bookingRouter.put("/:id", bookingController.update);
 bookingRouter.delete("/:id", bookingController.remove);
 

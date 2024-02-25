@@ -53,6 +53,31 @@ const detail = async (req, res) => {
 
 }
 
+const FindBoookinUser = async (req, res) => {
+    try {
+        const result = await bookingService.FindBoookinUser(req);
+        res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({
+            statusCode: 0,
+            message: "System error"
+        })
+    }
+
+}
+const statusBooking = async (req, res) => {
+    try {
+        const result = await bookingService.statusBooking(req);
+        res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({
+            statusCode: 0,
+            message: "System error"
+        })
+    }
+
+}
+
 const listPagination = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
@@ -75,5 +100,5 @@ export default {
     update,
     remove,
     detail,
-    listPagination
+    listPagination, statusBooking, FindBoookinUser
 }
