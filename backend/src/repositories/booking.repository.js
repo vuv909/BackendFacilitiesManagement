@@ -18,8 +18,6 @@ const StatusBooking = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    let days = [1, 2, 3, 4, 5, 6, 7];
-    let slots = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     // làm thế nào để kiểm tra thứ 2 có những người nào đăt được rồi: dựa vào status
     // dựa vào thời gian: 
     // thời gian bắt đầu và thời gian tạo 
@@ -85,6 +83,17 @@ const FindBooking = async (req) => {
     const existedUser = await Booking.findById(id, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
     return existedUser;
 }
+const FindBoookinUser = async (req) => {
+    const userProjecttion = {
+        createdAt: 0,
+        updatedAt: 0,
+        id: 0
+    }
+    const { id } = req.params;
+    console.log(" FindBoookinUser id " + id);
+    const existedUser = await Booking.find({ booker: id }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
+    return existedUser;
+}
 const UpdateOne = async (req) => {
 
     const { id } = req.params;
@@ -105,5 +114,5 @@ const CreateOne = async (req) => {
 }
 
 export default {
-    FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking
+    FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking, FindBoookinUser
 }

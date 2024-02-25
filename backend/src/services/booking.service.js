@@ -93,7 +93,20 @@ const statusBooking = async (req) => {
         }
     }
 }
+const FindBoookinUser = async (req) => {
+    console.log("statusBooking");
+    try {
+        let user = await bookingRepository.FindBoookinUser(req);
+        // console.log("hello user ");
+        return user;
+    } catch (error) {
+        return {
+            message: "Error",
+            content: error.toString()
+        }
+    }
+}
 export default {
     create,
-    update, FindAll, deleteOne, detail, statusBooking
+    update, FindAll, deleteOne, detail, statusBooking, FindBoookinUser
 }
