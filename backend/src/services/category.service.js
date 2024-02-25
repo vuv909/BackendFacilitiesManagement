@@ -43,7 +43,9 @@ const list = async (page, size, name) => {
        return {
             statusCode: 1,
             message: "Success",
-            data: listCategory
+            item: listCategory.items,
+            totalPage: Math.ceil(listCategory.total/size),
+            activePage: page
        };
     }catch(error){
         return {
