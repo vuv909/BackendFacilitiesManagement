@@ -52,8 +52,9 @@ const listPagination = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
     const name = req.query.name || '';
+    const category = req.query.categoryId || '';
     try{
-        const result = await facilityService.listPagination(page, size, name);
+        const result = await facilityService.listPagination(page, size, name, category);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     }catch(error){

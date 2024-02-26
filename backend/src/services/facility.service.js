@@ -1,5 +1,6 @@
 import Facility from "../models/Facility.js"
 import facilityRepository from "../repositories/facility.repository.js";
+import {categoryService} from "../services/index.js"
 
 const create = async (data, imageResult) => {
     try {
@@ -109,11 +110,14 @@ const detail = async (id) => {
     }
 }
 
-const listPagination = async (page, size, name) => {
+const listPagination = async (page, size, name, categoryId) => {
     const startIndex = (page - 1) * size;
-    const query = {
-        name: { $regex: name, $options: 'i' }
-    };
+    const category = await categoryService.findOne(categoryId);
+    const query = { name: {$regex: name, $options: 'i'}};
+    if(category.statusCode == 1){
+        query.category = categoryId;
+    }
+    
     try {
         const listFacility = await facilityRepository.findPagination(startIndex, size, query);
         return {
@@ -124,8 +128,9 @@ const listPagination = async (page, size, name) => {
             activePage: page
         }
     } catch (error) {
+        console.log(error);
         return {
-            statusCode: 0,
+            statusCode: 0, 
             message: "System error"
         }
     }

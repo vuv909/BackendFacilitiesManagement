@@ -16,12 +16,17 @@ const findFacility = async (id) => {
 }
 
 const findPagination = async (startIndex, size, query) => {
-    const listFacility = await Facility.find(query).skip(startIndex).limit(size);
-    const total = await Facility.countDocuments();
-    return {
-        items: listFacility,
-        total: total
-    };
+    try {
+        const listFacility = await Facility.find(query).skip(startIndex).limit(size).exec();
+        const total = await Facility.countDocuments(query).exec();
+        return {
+            items: listFacility,
+            total: total
+        };
+    } catch (error) {
+        console.error(error);
+        throw new Error('Error occurred while finding facilities.');
+    }
 }
 
 export default {
