@@ -1,4 +1,8 @@
+import mongoose from 'mongoose';
 import Booking from '../models/Booking.js'
+import { Types } from 'mongoose';
+
+
 
 const FindAll = async (req) => {
     const userProjecttion = {
@@ -90,9 +94,17 @@ const FindBoookinUser = async (req) => {
         id: 0
     }
     const { id } = req.params;
-    console.log(" FindBoookinUser id " + id);
-    const existedUser = await Booking.find({ booker: id }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
-    return existedUser;
+    const { ObjectId } = Types;
+    const existedUser = await Booking.find({
+    }, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
+    let arrUser = [];
+    for (const item of existedUser) {
+        if (item.booker?._id.equals(new ObjectId(id))) {
+            arrUser.push(item)
+        }
+    }
+    // existedUser.e;
+    return arrUser;
 }
 const UpdateOne = async (req) => {
 
