@@ -99,9 +99,26 @@ const remove = async (id) => {
     }
 }
 
+const findOne = async (id) => {
+    try{
+        const category = await categoryRepository.findOne({_id: id});
+        return {
+            message: "Get data successfully",
+            statusCode: 1,
+            content: category
+        }
+    }catch(error) {
+        return {
+            statusCode: 0,
+            message: "System error!"
+        }
+    }
+}
+
 export default {
     create,
     list,
     update,
-    remove
+    remove,
+    findOne
 }
