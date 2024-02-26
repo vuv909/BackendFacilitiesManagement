@@ -5,8 +5,8 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 //SINGLETON DESIGN PATTERN
-const connectString = `mongodb+srv://${process.env.URI}`
-// const connectString = process.env.LOCAL_URI;
+// const connectString = `mongodb+srv://${process.env.URI}`
+const connectString = process.env.LOCAL_URI;
 
 class Database {
 
