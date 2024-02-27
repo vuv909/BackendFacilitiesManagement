@@ -36,11 +36,11 @@ const create = async (data, imageResult) => {
 const update = async (data, imageResult) => {
     const facility = data;
     if (imageResult.statusCode == 1 && imageResult.urls) {
-        facility.image = data.urls[0];
+        facility.image = imageResult.urls[0];
     }
     try {
         const existedFacility = await Facility.findById(facility?.id);
-        if (!existedFacility || existedFacility.length <= 0) {
+        if (!existedFacility) {
             return {
                 statusCode: 0,
                 message: "Facility not existed"
@@ -59,6 +59,7 @@ const update = async (data, imageResult) => {
             data: existedFacility
         }
     } catch (error) {
+        console.log(error);
         return {
             statusCode: 0,
             message: "System error"
