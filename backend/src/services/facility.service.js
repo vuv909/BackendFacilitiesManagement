@@ -115,9 +115,9 @@ const listPagination = async (page, size, name, categoryId) => {
     const category = await categoryService.findOne(categoryId);
     const query = { name: {$regex: name, $options: 'i'}};
     if(category.statusCode == 1){
-        query.category = categoryId;
+        query.category = "65b67bd8d592174dbb9ee9dd"; 
     }
-    
+    console.log(query);
     try {
         const listFacility = await facilityRepository.findPagination(startIndex, size, query);
         return {
@@ -127,7 +127,7 @@ const listPagination = async (page, size, name, categoryId) => {
             totalPage: Math.ceil(listFacility.total/size),
             activePage: page
         }
-    } catch (error) {
+    } catch (error) { 
         console.log(error);
         return {
             statusCode: 0, 
