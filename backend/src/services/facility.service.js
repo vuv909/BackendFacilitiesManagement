@@ -116,7 +116,7 @@ const listPagination = async (page, size, name, categoryId) => {
     const category = await categoryService.findOne(categoryId);
     const query = { name: {$regex: name, $options: 'i'}};
     if(category.statusCode == 1){
-        query.category = "65b67bd8d592174dbb9ee9dd"; 
+        query.category = categoryId; 
     }
     console.log(query);
     try {
