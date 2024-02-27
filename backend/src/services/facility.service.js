@@ -51,7 +51,7 @@ const update = async (data, imageResult) => {
         existedFacility.location = facility.location;
         existedFacility.status = facility.status;
         existedFacility.category = facility.category;
-        existedFacility.image = facility.image;
+        existedFacility.image = facility.image ? facility.image : existedFacility.image;
         await existedFacility.save();
         return {
             statusCode: 1,

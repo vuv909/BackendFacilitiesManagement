@@ -3,7 +3,7 @@ import multiparty from 'multiparty';
 
 const maxFileSize = "10MB";
 
-function validatorFormData(attributeName) {
+function validatorFormData(attributeName, isRequireImage) {
     return async function (req, res, next) {
         const form = new multiparty.Form({ maxFieldsSize: maxFileSize });
         // Wrap form.parse in a promise to use async/await
@@ -28,19 +28,21 @@ function validatorFormData(attributeName) {
                 resultObject[field] = fieldValue;
             });
             resultObject.files = filesData;
-            const length = filesData ? filesData[0].size / 1000 / 1024 : 0;
-            if (length > 10) {
-                return res.status(400).json([{
-                    type: "file",
-                    value: attributeName,
-                    msg: `File can not exceed ${maxFileSize}`,
-                }])
-            }else if(!filesData || filesData[0].size <= 0) {
-                return res.status(400).json([{
-                    type: "file",
-                    value: attributeName,
-                    msg: "File cannot be empty"
-                }])
+            if(isRequireImage){
+                const length = filesData ? filesData[0].size / 1000 / 1024 : 0;
+                if (length > 10) {
+                    return res.status(400).json([{
+                        type: "file",
+                        value: attributeName,
+                        msg: `File can not exceed ${maxFileSize}`,
+                    }])
+                }else if(!filesData || filesData[0].size <= 0) {
+                    return res.status(400).json([{
+                        type: "file",
+                        value: attributeName,
+                        msg: "File cannot be empty"
+                    }])
+                }
             }
             req.body = resultObject;
             next();

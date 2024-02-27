@@ -8,7 +8,7 @@ const facilityRouter = express.Router();
 facilityRouter.post("/create",
     [
         authJWT.verifyToken,
-        validator.validatorFormData("img"),
+        validator.validatorFormData("img", true),
         body("name").notEmpty().withMessage("Name of facility can not be null"),
         validator.checkError
     ],
@@ -17,7 +17,7 @@ facilityRouter.get("/list", facilityController.listPagination);
 facilityRouter.get("/detail/:id", facilityController.detail);
 facilityRouter.put("/update",
     [
-        validator.validatorFormData("img"),
+        validator.validatorFormData("img", false),
         body("name").notEmpty().withMessage("Name of facility can not be null"),
         validator.checkError
     ],
