@@ -28,6 +28,9 @@ const Facility = mongoose.model("Facility", new Schema(
             type: String,
             require: false
         },
+        shortTitle: {
+            type: String,
+        },
         modifiedBy: {
             type: String,
         },
