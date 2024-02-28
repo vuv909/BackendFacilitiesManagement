@@ -28,7 +28,7 @@ const FindAll = async (req) => {
         } else if (bookingObject.status == 4) {
             bookingObject.status = 'Success';
         }
-        console.log(bookingObject);
+
         return bookingObject;
     });
 
