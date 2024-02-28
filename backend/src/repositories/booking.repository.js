@@ -10,8 +10,29 @@ const FindAll = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    const existedUser = await Booking.find({}, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
-    return existedUser;
+    const existedUser = await Booking.find({}, userProjecttion)
+        .populate({ path: 'booker', select: userProjecttion })
+        .populate({ path: 'facilityId', select: userProjecttion })
+        .populate({ path: 'handler', select: userProjecttion })
+        .exec();
+
+    // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
+    const updatedExistedUser = existedUser.map(booking => {
+        let bookingObject = booking.toObject();
+        if (bookingObject.status == 1) {
+            bookingObject.status = 'Pending';
+        } else if (bookingObject.status == 2) {
+            bookingObject.status = 'Accept';
+        } else if (bookingObject.status == 3) {
+            bookingObject.status = 'Reject';
+        } else if (bookingObject.status == 4) {
+            bookingObject.status = 'Success';
+        }
+
+        return bookingObject;
+    });
+
+    return updatedExistedUser;
 }
 /*
 - lấy mảng 7 ngày; ở mỗi ngày sẽ có mảng 9 slot,  
