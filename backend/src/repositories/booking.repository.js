@@ -43,9 +43,7 @@ const StatusBooking = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    // làm thế nào để kiểm tra thứ 2 có những người nào đăt được rồi: dựa vào status
-    // dựa vào thời gian: 
-    // thời gian bắt đầu và thời gian tạo 
+    const { id } = req.params;
     let today = new Date();
     today.setHours(0, 0, 0, 0);
     let oneWeekFromToday = new Date(today.getTime() + 8 * 24 * 60 * 60 * 1000);
@@ -58,7 +56,7 @@ const StatusBooking = async (req) => {
     // nếu ngày hôm đấy là thứ 2 thì tống cổ vào mảng của thứ 2
     // thứ 3 thì tổng cổ vào thứ 3
     // (nếu muốn rõ từng slot): thì so sánh nếu thứ đấy, vào trong if (slot 1 hay 2...) thì tống cổ vào đấy là được 
-    console.log(oneWeekFromToday);
+    console.log(id);
     let arrangeSeven = {
         Monday: [],
         Tuesday: [],
@@ -68,7 +66,7 @@ const StatusBooking = async (req) => {
         Saturday: [],
         Sunday: [],
     }
-    const sevenDay = await Booking.find({ startDate: { $gte: today, $lte: oneWeekFromToday } }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
+    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
     // console.log(sevenDay);
     for (const day of sevenDay) {
         let nameDay = day.startDate.toLocaleDateString("en-US", { weekday: "long" });
