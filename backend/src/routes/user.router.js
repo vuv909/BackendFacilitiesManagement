@@ -10,7 +10,7 @@ userRouter.post("/login", userController.login);
 userRouter.get("/", userController.FindAll);
 // view user profile
 // created by: quốc khánh 
-userRouter.get("/:id", authJWT.verifyToken, userController.FindOne);
+userRouter.get("/:id", userController.FindOne);
 
 // Update User profile 
 userRouter.put("/:id", userController.UpdateOne);
