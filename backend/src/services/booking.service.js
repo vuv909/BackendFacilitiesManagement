@@ -96,7 +96,7 @@ const statusBooking = async (req) => {
 const FindBoookinUser = async (req) => {
     console.log("statusBooking");
     try {
-        let user = await bookingRepository.FindBoookinUser(req);
+        let user = await bookingRepository.FindBoookingUser(req);
         // console.log("hello user ");
         return user;
     } catch (error) {
