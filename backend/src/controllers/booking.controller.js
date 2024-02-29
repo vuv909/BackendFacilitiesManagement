@@ -79,13 +79,9 @@ const statusBooking = async (req, res) => {
 }
 
 const listPagination = async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const size = parseInt(req.query.size) || 5;
-    const name = req.query.bookingName || '';
-    const status = parseInt(req.query.status) || null;
-    console.log("find all");
+
     try {
-        const response = await bookingService.FindAll();
+        const response = await bookingService.FindAll(req);
 
         return res.status(200).json(response);
     } catch (error) {

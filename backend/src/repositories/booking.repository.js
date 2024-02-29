@@ -10,10 +10,16 @@ const FindAll = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    const existedUser = await Booking.find({}, userProjecttion)
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 5;
+    const { weeks } = req.query
+    const startIndex = (page - 1) * size;
+    const query = { weeks: { $regex: weeks, $options: 'i' } };
+
+    const existedUser = await Booking.find(query, userProjecttion)
         .populate({ path: 'booker', select: userProjecttion })
         .populate({ path: 'facilityId', select: userProjecttion })
-        .populate({ path: 'handler', select: userProjecttion })
+        .populate({ path: 'handler', select: userProjecttion }).skip(startIndex).limit(size)
         .exec();
 
     // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
@@ -116,13 +122,16 @@ const FindBooking = async (req) => {
     const existedUser = await Booking.findById(id, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
     return existedUser;
 }
-const FindBoookinUser = async (req) => {
+const FindBoookingUser = async (req) => {
     const userProjecttion = {
         createdAt: 0,
         updatedAt: 0,
         id: 0
     }
+
     const { id } = req.params;
+
+
     const { ObjectId } = Types;
     const existedUser = await Booking.find({
     }, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
@@ -155,5 +164,5 @@ const CreateOne = async (req) => {
 }
 
 export default {
-    FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking, FindBoookinUser
+    FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking, FindBoookingUser
 }
