@@ -58,7 +58,7 @@ const StatusBooking = async (req) => {
     // nếu ngày hôm đấy là thứ 2 thì tống cổ vào mảng của thứ 2
     // thứ 3 thì tổng cổ vào thứ 3
     // (nếu muốn rõ từng slot): thì so sánh nếu thứ đấy, vào trong if (slot 1 hay 2...) thì tống cổ vào đấy là được 
-
+    console.log(oneWeekFromToday);
     let arrangeSeven = {
         Monday: [],
         Tuesday: [],
@@ -68,30 +68,40 @@ const StatusBooking = async (req) => {
         Saturday: [],
         Sunday: [],
     }
-    const sevenDay = await Booking.find({ startDate: { $gte: today, $lte: oneWeekFromToday }, status: 2 }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
-    console.log(sevenDay);
+    const sevenDay = await Booking.find({ startDate: { $gte: today, $lte: oneWeekFromToday } }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
+    // console.log(sevenDay);
     for (const day of sevenDay) {
         let nameDay = day.startDate.toLocaleDateString("en-US", { weekday: "long" });
+        let bookingObject = day.toObject();
+        if (bookingObject.status == 1) {
+            bookingObject.status = 'Pending';
+        } else if (bookingObject.status == 2) {
+            bookingObject.status = 'Accept';
+        } else if (bookingObject.status == 3) {
+            bookingObject.status = 'Reject';
+        } else if (bookingObject.status == 4) {
+            bookingObject.status = 'Success';
+        }
         if (nameDay === 'Monday') {
-            arrangeSeven.Monday.push(day);
+            arrangeSeven.Monday.push(bookingObject);
         }
         else if (nameDay === 'Tuesday') {
-            arrangeSeven.Tuesday.push(day);
+            arrangeSeven.Tuesday.push(bookingObject);
         }
         else if (nameDay === 'Wednesday') {
-            arrangeSeven.Wednesday.push(day);
+            arrangeSeven.Wednesday.push(bookingObject);
         }
         else if (nameDay === 'Thursday') {
-            arrangeSeven.Thursday.push(day);
+            arrangeSeven.Thursday.push(bookingObject);
         }
         else if (nameDay === 'Friday') {
-            arrangeSeven.Friday.push(day);
+            arrangeSeven.Friday.push(bookingObject);
         }
         else if (nameDay === 'Saturday') {
-            arrangeSeven.Saturday.push(day);
+            arrangeSeven.Saturday.push(bookingObject);
         }
         else if (nameDay === 'Sunday') {
-            arrangeSeven.Sunday.push(day);
+            arrangeSeven.Sunday.push(bookingObject);
         }
 
     }
