@@ -119,6 +119,10 @@ const FindBooking = async (req) => {
         id: 0
     }
     const { id } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 5;
+    // const { weeks } = req.query
+    const startIndex = (page - 1) * size;
     const existedUser = await Booking.findById(id, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
     return existedUser;
 }
@@ -131,7 +135,11 @@ const FindBoookingUser = async (req) => {
 
     const { id } = req.params;
 
-
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 5;
+    // const { weeks } = req.query
+    const startIndex = (page - 1) * size;
+    // const query = { weeks: { $regex: weeks, $options: 'i' } };
     const { ObjectId } = Types;
     const existedUser = await Booking.find({
     }, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
@@ -141,8 +149,17 @@ const FindBoookingUser = async (req) => {
             arrUser.push(item)
         }
     }
+    // Phân trang
+    const paginatedArrUser = arrUser.slice(startIndex, startIndex + size);
 
-    const updatedExistedUser = arrUser.map(booking => {
+    // Tạo object chứa thông tin phân trang
+    const paginationInfo = {
+        currentPage: page,
+        totalPages: Math.ceil(arrUser.length / size),
+        totalItems: arrUser.length,
+        pageSize: size
+    };
+    const updatedExistedUser = paginatedArrUser.map(booking => {
         let bookingObject = booking.toObject();
         if (bookingObject.status == 1) {
             bookingObject.status = 'Pending';
