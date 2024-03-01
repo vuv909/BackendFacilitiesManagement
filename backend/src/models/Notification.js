@@ -13,13 +13,6 @@ const Notification = mongoose.model("Notification", new Schema(
         },
         path: {
             type: String,
-        },
-        modifiedBy: {
-            type: String,
-        },
-        createdBy: {
-            type: String,
-            require: true
         }
     },
     {

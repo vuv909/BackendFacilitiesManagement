@@ -1,9 +1,18 @@
-
-const getNotificationByUser = (req, res) => {
-    const id = req.query;
+import { response } from "express";
+import { notificationService } from "../services/index.js";
+const getNotificationByUser = async (req, res) => {
+    const id = req.userId;
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 5;
     try {
-        
+        const result = await notificationService.getNotificationByUserId({userId: id, page, size});
+        const code = result.statusCode === 0 ? 200 : 500;
+        return res.status(code).json(result);
     } catch (error) {
-
+        return res.status(500).json(error);
     }
+}
+
+export default {
+    getNotificationByUser
 }
