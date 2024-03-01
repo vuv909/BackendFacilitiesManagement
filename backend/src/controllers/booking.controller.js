@@ -81,6 +81,7 @@ const statusBooking = async (req, res) => {
 const listPagination = async (req, res) => {
 
     try {
+        console.log("hello");
         const response = await bookingService.FindAll(req);
 
         return res.status(200).json(response);

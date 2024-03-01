@@ -12,9 +12,13 @@ const FindAll = async (req) => {
     }
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
-    const { weeks } = req.query
     const startIndex = (page - 1) * size;
-    const query = { weeks: { $regex: weeks, $options: 'i' } };
+    let { weeks } = req.query
+    let query = {};
+    if (weeks) {
+
+        query = { weeks: { $regex: weeks, $options: 'i' } };
+    }
 
     const existedUser = await Booking.find(query, userProjecttion)
         .populate({ path: 'booker', select: userProjecttion })
