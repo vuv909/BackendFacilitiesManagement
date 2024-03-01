@@ -32,7 +32,7 @@ const FindAll = async (req) => {
         } else if (bookingObject.status == 3) {
             bookingObject.status = 'Reject';
         } else if (bookingObject.status == 4) {
-            bookingObject.status = 'Success';
+            bookingObject.status = 'Expire';
         }
 
         return bookingObject;
@@ -84,7 +84,7 @@ const StatusBooking = async (req) => {
         } else if (bookingObject.status == 3) {
             bookingObject.status = 'Reject';
         } else if (bookingObject.status == 4) {
-            bookingObject.status = 'Success';
+            bookingObject.status = 'Expire';
         }
         if (nameDay === 'Monday') {
             arrangeSeven.Monday.push(bookingObject);
@@ -151,7 +151,7 @@ const FindBoookingUser = async (req) => {
         } else if (bookingObject.status == 3) {
             bookingObject.status = 'Reject';
         } else if (bookingObject.status == 4) {
-            bookingObject.status = 'Success';
+            bookingObject.status = 'Expire';
         }
 
         return bookingObject;
