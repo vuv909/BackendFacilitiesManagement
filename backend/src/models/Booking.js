@@ -5,12 +5,12 @@ const BookingSchema = new Schema(
         booker: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: false,
         },
         facilityId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Facility",
-            required: true,
+            required: false,
         },
         handler: {
             type: mongoose.Schema.Types.ObjectId,
