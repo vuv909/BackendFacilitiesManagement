@@ -141,8 +141,23 @@ const FindBoookingUser = async (req) => {
             arrUser.push(item)
         }
     }
+
+    const updatedExistedUser = arrUser.map(booking => {
+        let bookingObject = booking.toObject();
+        if (bookingObject.status == 1) {
+            bookingObject.status = 'Pending';
+        } else if (bookingObject.status == 2) {
+            bookingObject.status = 'Accept';
+        } else if (bookingObject.status == 3) {
+            bookingObject.status = 'Reject';
+        } else if (bookingObject.status == 4) {
+            bookingObject.status = 'Success';
+        }
+
+        return bookingObject;
+    });
     // existedUser.e;
-    return arrUser;
+    return updatedExistedUser;
 }
 const UpdateOne = async (req) => {
 
