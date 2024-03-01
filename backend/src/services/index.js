@@ -4,6 +4,7 @@ import facilityService from "./facility.service.js";
 import fileService from "./file.service.js";
 import bookingService from "./booking.service.js";
 import roleService from "./role.service.js";
+import notificationService from "./notification.service.js";
 
 export {
     userService,
@@ -12,4 +13,5 @@ export {
     facilityService,
     bookingService,
     roleService,
+    notificationService
 }
