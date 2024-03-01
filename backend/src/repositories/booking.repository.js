@@ -10,8 +10,35 @@ const FindAll = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    const existedUser = await Booking.find({}, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
-    return existedUser;
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 5;
+    const { weeks } = req.query
+    const startIndex = (page - 1) * size;
+    const query = { weeks: { $regex: weeks, $options: 'i' } };
+
+    const existedUser = await Booking.find(query, userProjecttion)
+        .populate({ path: 'booker', select: userProjecttion })
+        .populate({ path: 'facilityId', select: userProjecttion })
+        .populate({ path: 'handler', select: userProjecttion }).skip(startIndex).limit(size)
+        .exec();
+
+    // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
+    const updatedExistedUser = existedUser.map(booking => {
+        let bookingObject = booking.toObject();
+        if (bookingObject.status == 1) {
+            bookingObject.status = 'Pending';
+        } else if (bookingObject.status == 2) {
+            bookingObject.status = 'Accept';
+        } else if (bookingObject.status == 3) {
+            bookingObject.status = 'Reject';
+        } else if (bookingObject.status == 4) {
+            bookingObject.status = 'Success';
+        }
+
+        return bookingObject;
+    });
+
+    return updatedExistedUser;
 }
 /*
 - lấy mảng 7 ngày; ở mỗi ngày sẽ có mảng 9 slot,  
@@ -22,9 +49,7 @@ const StatusBooking = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    // làm thế nào để kiểm tra thứ 2 có những người nào đăt được rồi: dựa vào status
-    // dựa vào thời gian: 
-    // thời gian bắt đầu và thời gian tạo 
+    const { id } = req.params;
     let today = new Date();
     today.setHours(0, 0, 0, 0);
     let oneWeekFromToday = new Date(today.getTime() + 8 * 24 * 60 * 60 * 1000);
@@ -37,7 +62,7 @@ const StatusBooking = async (req) => {
     // nếu ngày hôm đấy là thứ 2 thì tống cổ vào mảng của thứ 2
     // thứ 3 thì tổng cổ vào thứ 3
     // (nếu muốn rõ từng slot): thì so sánh nếu thứ đấy, vào trong if (slot 1 hay 2...) thì tống cổ vào đấy là được 
-
+    console.log(id);
     let arrangeSeven = {
         Monday: [],
         Tuesday: [],
@@ -47,30 +72,40 @@ const StatusBooking = async (req) => {
         Saturday: [],
         Sunday: [],
     }
-    const sevenDay = await Booking.find({ startDate: { $gte: today, $lte: oneWeekFromToday }, status: 2 }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
-    console.log(sevenDay);
+    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
+    // console.log(sevenDay);
     for (const day of sevenDay) {
         let nameDay = day.startDate.toLocaleDateString("en-US", { weekday: "long" });
+        let bookingObject = day.toObject();
+        if (bookingObject.status == 1) {
+            bookingObject.status = 'Pending';
+        } else if (bookingObject.status == 2) {
+            bookingObject.status = 'Accept';
+        } else if (bookingObject.status == 3) {
+            bookingObject.status = 'Reject';
+        } else if (bookingObject.status == 4) {
+            bookingObject.status = 'Success';
+        }
         if (nameDay === 'Monday') {
-            arrangeSeven.Monday.push(day);
+            arrangeSeven.Monday.push(bookingObject);
         }
         else if (nameDay === 'Tuesday') {
-            arrangeSeven.Tuesday.push(day);
+            arrangeSeven.Tuesday.push(bookingObject);
         }
         else if (nameDay === 'Wednesday') {
-            arrangeSeven.Wednesday.push(day);
+            arrangeSeven.Wednesday.push(bookingObject);
         }
         else if (nameDay === 'Thursday') {
-            arrangeSeven.Thursday.push(day);
+            arrangeSeven.Thursday.push(bookingObject);
         }
         else if (nameDay === 'Friday') {
-            arrangeSeven.Friday.push(day);
+            arrangeSeven.Friday.push(bookingObject);
         }
         else if (nameDay === 'Saturday') {
-            arrangeSeven.Saturday.push(day);
+            arrangeSeven.Saturday.push(bookingObject);
         }
         else if (nameDay === 'Sunday') {
-            arrangeSeven.Sunday.push(day);
+            arrangeSeven.Sunday.push(bookingObject);
         }
 
     }
@@ -87,13 +122,16 @@ const FindBooking = async (req) => {
     const existedUser = await Booking.findById(id, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
     return existedUser;
 }
-const FindBoookinUser = async (req) => {
+const FindBoookingUser = async (req) => {
     const userProjecttion = {
         createdAt: 0,
         updatedAt: 0,
         id: 0
     }
+
     const { id } = req.params;
+
+
     const { ObjectId } = Types;
     const existedUser = await Booking.find({
     }, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
@@ -103,8 +141,23 @@ const FindBoookinUser = async (req) => {
             arrUser.push(item)
         }
     }
+
+    const updatedExistedUser = arrUser.map(booking => {
+        let bookingObject = booking.toObject();
+        if (bookingObject.status == 1) {
+            bookingObject.status = 'Pending';
+        } else if (bookingObject.status == 2) {
+            bookingObject.status = 'Accept';
+        } else if (bookingObject.status == 3) {
+            bookingObject.status = 'Reject';
+        } else if (bookingObject.status == 4) {
+            bookingObject.status = 'Success';
+        }
+
+        return bookingObject;
+    });
     // existedUser.e;
-    return arrUser;
+    return updatedExistedUser;
 }
 const UpdateOne = async (req) => {
 
@@ -126,5 +179,5 @@ const CreateOne = async (req) => {
 }
 
 export default {
-    FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking, FindBoookinUser
+    FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking, FindBoookingUser
 }

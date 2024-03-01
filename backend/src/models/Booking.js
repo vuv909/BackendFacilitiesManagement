@@ -19,23 +19,29 @@ const BookingSchema = new Schema(
         },
         startDate: {
             type: Date,
-            required: true,
+            required: false,
         },
         endDate: {
             type: Date,
-            required: true,
+            required: false,
         },
         slot: {
             type: String,
-            required: true,
+            required: false,
+        },
+        weeks: {
+            type: String,
+        },
+        weekdays: {
+            type: String,
         },
         status: {
             type: Number,
-            required: true,
+            required: false,
         },
         createdBy: {
             type: String,
-            required: true,
+            required: false,
         },
         modifiedBy: {
             type: String,
