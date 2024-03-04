@@ -17,7 +17,7 @@ const FindAll = async (req) => {
     let query = {};
     if (weeks) {
 
-        query = { weeks: { $regex: weeks, $options: 'i' } };
+        query = { weeks: { $regex: weeks, $options: 'i' }, status: 2 };
     }
 
     const existedUser = await Booking.find(query, userProjecttion)
@@ -25,24 +25,54 @@ const FindAll = async (req) => {
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion }).skip(startIndex).limit(size)
         .exec();
-
+    let arrangeSeven = {
+        Monday: [],
+        Tuesday: [],
+        Wednesday: [],
+        Thursday: [],
+        Friday: [],
+        Saturday: [],
+        Sunday: [],
+    }
     // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
-    const updatedExistedUser = existedUser.map(booking => {
-        let bookingObject = booking.toObject();
-        if (bookingObject.status == 1) {
-            bookingObject.status = 'Pending';
-        } else if (bookingObject.status == 2) {
-            bookingObject.status = 'Accept';
-        } else if (bookingObject.status == 3) {
-            bookingObject.status = 'Reject';
-        } else if (bookingObject.status == 4) {
-            bookingObject.status = 'Expire';
+    // console.log(sevenDay);
+    for (const day of existedUser) {
+        let nameDay = day.startDate.toLocaleDateString("en-US", { weekday: "long" });
+        // let bookingObject = day.toObject();
+        // if (bookingObject.status == 1) {
+        //     bookingObject.status = 'Pending';
+        // } else if (bookingObject.status == 2) {
+        //     bookingObject.status = 'Accept';
+        // } else if (bookingObject.status == 3) {
+        //     bookingObject.status = 'Reject';
+        // } else if (bookingObject.status == 4) {
+        //     bookingObject.status = 'Expire';
+        // }
+        if (nameDay === 'Monday') {
+            arrangeSeven.Monday.push(day);
+        }
+        else if (nameDay === 'Tuesday') {
+            arrangeSeven.Tuesday.push(day);
+        }
+        else if (nameDay === 'Wednesday') {
+            arrangeSeven.Wednesday.push(day);
+        }
+        else if (nameDay === 'Thursday') {
+            arrangeSeven.Thursday.push(day);
+        }
+        else if (nameDay === 'Friday') {
+            arrangeSeven.Friday.push(day);
+        }
+        else if (nameDay === 'Saturday') {
+            arrangeSeven.Saturday.push(day);
+        }
+        else if (nameDay === 'Sunday') {
+            arrangeSeven.Sunday.push(day);
         }
 
-        return bookingObject;
-    });
+    }
 
-    return updatedExistedUser;
+    return arrangeSeven;
 }
 /*
 - lấy mảng 7 ngày; ở mỗi ngày sẽ có mảng 9 slot,  
@@ -80,7 +110,7 @@ const StatusBooking = async (req) => {
     // console.log(sevenDay);
     for (const day of sevenDay) {
         let nameDay = day.startDate.toLocaleDateString("en-US", { weekday: "long" });
-        let bookingObject = day.toObject();
+        let day = day.toObject();
         if (bookingObject.status == 1) {
             bookingObject.status = 'Pending';
         } else if (bookingObject.status == 2) {
@@ -163,33 +193,38 @@ const FindBoookingUser = async (req) => {
         totalItems: arrUser.length,
         pageSize: size
     };
-    const updatedExistedUser = paginatedArrUser.map(booking => {
-        let bookingObject = booking.toObject();
-        if (bookingObject.status == 1) {
-            bookingObject.status = 'Pending';
-        } else if (bookingObject.status == 2) {
-            bookingObject.status = 'Accept';
-        } else if (bookingObject.status == 3) {
-            bookingObject.status = 'Reject';
-        } else if (bookingObject.status == 4) {
-            bookingObject.status = 'Expire';
-        }
+    // const updatedExistedUser = paginatedArrUser.map(booking => {
+    //     let bookingObject = booking.toObject();
+    //     if (bookingObject.status == 1) {
+    //         bookingObject.status = 'Pending';
+    //     } else if (bookingObject.status == 2) {
+    //         bookingObject.status = 'Accept';
+    //     } else if (bookingObject.status == 3) {
+    //         bookingObject.status = 'Reject';
+    //     } else if (bookingObject.status == 4) {
+    //         bookingObject.status = 'Expire';
+    //     }
 
-        return bookingObject;
-    });
+    //     return bookingObject;
+    // });
     // existedUser.e;
-    return updatedExistedUser;
+    return paginatedArrUser;
 }
 const UpdateOne = async (req) => {
-
+    let booking = await FindBooking(req);
+    if (!booking) {
+        return null;
+    }
     const { id } = req.params;
-    console.log("id = " + id);
-    console.log(req.body);
+
     const existedUser = await Booking.findByIdAndUpdate(id, req.body, { new: true }).exec();
     return existedUser;
 }
 const DeleteOne = async (req) => {
-
+    let booking = await FindBooking(req);
+    if (!booking) {
+        return null;
+    }
     const { id } = req.params;
     const existedUser = await Booking.deleteOne({ _id: id }).exec();
     return existedUser;
