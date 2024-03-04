@@ -6,6 +6,12 @@ const update = async (req) => {
 
     try {
         const result = await bookingRepository.UpdateOne(req);
+        if (result == null) {
+            return {
+                statusCode: 400,
+                message: "Not found Id "
+            }
+        }
         return {
             statusCode: 200,
             result: result,
@@ -24,6 +30,12 @@ const deleteOne = async (req) => {
 
     try {
         const result = await bookingRepository.DeleteOne(req);
+        if (result == null) {
+            return {
+                statusCode: 400,
+                message: "Not found Id "
+            }
+        }
         return {
             statusCode: 1,
             result: result,
@@ -97,7 +109,6 @@ const FindBoookinUser = async (req) => {
     console.log("statusBooking");
     try {
         let user = await bookingRepository.FindBoookingUser(req);
-        // console.log("hello user ");
         return user;
     } catch (error) {
         return {
