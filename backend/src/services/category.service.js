@@ -63,7 +63,7 @@ const update = async (data, imageResult) => {
         }
         const categoryUpdate = await categoryRepository.findOne({_id: category.id});
         categoryUpdate.categoryName = category.categoryName;
-        categoryUpdate.image = category.image;
+        categoryUpdate.image = category.image ? category.image : categoryUpdate.image;
         await categoryUpdate.save();
         return {
             message: "Update successfully",
