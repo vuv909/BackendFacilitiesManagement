@@ -35,9 +35,9 @@ const FindAll = async (req) => {
         Sunday: [],
     }
     // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
-    // console.log(sevenDay);
+    // console.log(existedUser);
     for (const day of existedUser) {
-        let nameDay = day.startDate.toLocaleDateString("en-US", { weekday: "long" });
+        let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
         // let bookingObject = day.toObject();
         // if (bookingObject.status == 1) {
         //     bookingObject.status = 'Pending';
@@ -107,9 +107,9 @@ const StatusBooking = async (req) => {
         Sunday: [],
     }
     const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
-    // console.log(sevenDay);
+    console.log(sevenDay);
     for (const day of sevenDay) {
-        let nameDay = day.startDate.toLocaleDateString("en-US", { weekday: "long" });
+        let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
         let day = day.toObject();
         if (bookingObject.status == 1) {
             bookingObject.status = 'Pending';
