@@ -14,10 +14,13 @@ const FindAll = async (req) => {
     const size = parseInt(req.query.size) || 5;
     const startIndex = (page - 1) * size;
     let { weeks } = req.query
+    let { status } = req.query;
     let query = {};
     if (weeks) {
-
         query = { weeks: { $regex: weeks, $options: 'i' }, status: 2 };
+    }
+    if (status) {
+        query = { ...query, status: status };
     }
 
     const existedUser = await Booking.find(query, userProjecttion)
@@ -25,52 +28,56 @@ const FindAll = async (req) => {
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion }).skip(startIndex).limit(size)
         .exec();
-    let arrangeSeven = {
-        Monday: [],
-        Tuesday: [],
-        Wednesday: [],
-        Thursday: [],
-        Friday: [],
-        Saturday: [],
-        Sunday: [],
-    }
-    // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
-    // console.log(sevenDay);
-    for (const day of existedUser) {
-        let nameDay = day.startDate.toLocaleDateString("en-US", { weekday: "long" });
-        // let bookingObject = day.toObject();
-        // if (bookingObject.status == 1) {
-        //     bookingObject.status = 'Pending';
-        // } else if (bookingObject.status == 2) {
-        //     bookingObject.status = 'Accept';
-        // } else if (bookingObject.status == 3) {
-        //     bookingObject.status = 'Reject';
-        // } else if (bookingObject.status == 4) {
-        //     bookingObject.status = 'Expire';
-        // }
-        if (nameDay === 'Monday') {
-            arrangeSeven.Monday.push(day);
+    let arrangeSeven = existedUser;
+    if (weeks) {
+        arrangeSeven = {
+            Monday: [],
+            Tuesday: [],
+            Wednesday: [],
+            Thursday: [],
+            Friday: [],
+            Saturday: [],
+            Sunday: [],
         }
-        else if (nameDay === 'Tuesday') {
-            arrangeSeven.Tuesday.push(day);
-        }
-        else if (nameDay === 'Wednesday') {
-            arrangeSeven.Wednesday.push(day);
-        }
-        else if (nameDay === 'Thursday') {
-            arrangeSeven.Thursday.push(day);
-        }
-        else if (nameDay === 'Friday') {
-            arrangeSeven.Friday.push(day);
-        }
-        else if (nameDay === 'Saturday') {
-            arrangeSeven.Saturday.push(day);
-        }
-        else if (nameDay === 'Sunday') {
-            arrangeSeven.Sunday.push(day);
-        }
+        // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
+        // console.log(existedUser);
+        for (const day of existedUser) {
+            let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
+            // let bookingObject = day.toObject();
+            // if (bookingObject.status == 1) {
+            //     bookingObject.status = 'Pending';
+            // } else if (bookingObject.status == 2) {
+            //     bookingObject.status = 'Accept';
+            // } else if (bookingObject.status == 3) {
+            //     bookingObject.status = 'Reject';
+            // } else if (bookingObject.status == 4) {
+            //     bookingObject.status = 'Expire';
+            // }
+            if (nameDay === 'Monday') {
+                arrangeSeven.Monday.push(day);
+            }
+            else if (nameDay === 'Tuesday') {
+                arrangeSeven.Tuesday.push(day);
+            }
+            else if (nameDay === 'Wednesday') {
+                arrangeSeven.Wednesday.push(day);
+            }
+            else if (nameDay === 'Thursday') {
+                arrangeSeven.Thursday.push(day);
+            }
+            else if (nameDay === 'Friday') {
+                arrangeSeven.Friday.push(day);
+            }
+            else if (nameDay === 'Saturday') {
+                arrangeSeven.Saturday.push(day);
+            }
+            else if (nameDay === 'Sunday') {
+                arrangeSeven.Sunday.push(day);
+            }
 
+        }
     }
+
 
     return arrangeSeven;
 }
@@ -107,9 +114,9 @@ const StatusBooking = async (req) => {
         Sunday: [],
     }
     const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
-    // console.log(sevenDay);
+    console.log(sevenDay);
     for (const day of sevenDay) {
-        let nameDay = day.startDate.toLocaleDateString("en-US", { weekday: "long" });
+        let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
         let day = day.toObject();
         if (bookingObject.status == 1) {
             bookingObject.status = 'Pending';
