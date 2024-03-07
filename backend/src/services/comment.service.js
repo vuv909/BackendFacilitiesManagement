@@ -1,10 +1,15 @@
 import Booking from "../models/Booking.js";
 import Comment from "../models/Comment.js";
 import commentRepository from "../repositories/comment.repository.js";
+import userRepository from "../repositories/user.repository.js";
+import facilityService from "./facility.service.js";
+import notificationService from "./notification.service.js";
+import userService from "./user.service.js";
 
 const create = async (comment, userId) => {
     try {
         const resultCheckPermission = await checkCommentPermisson({facilityId: comment.facility, userId});
+        console.log(userId);
         if(resultCheckPermission.statusCode === 0){
             return {
                 statusCode: 0,
@@ -21,6 +26,14 @@ const create = async (comment, userId) => {
         comment.userId = userId;
         comment.createdBy = userId;
         const newComment = await Comment.create(comment);
+        const currentUser = await userRepository.findUser(userId);
+        const facility = await facilityService.detail(comment.facility);
+        const notification = {
+            content: `${currentUser.name} đã comment ở: ${facility.data?.name}`,
+            path: `/detail/${comment.facility}`
+        }
+        console.log(notification);
+        await notificationService.sendNotificationToAdmin(notification);
         newComment.populate([
             { path: 'userId' },
             { path: "booking" },
@@ -40,7 +53,6 @@ const create = async (comment, userId) => {
 
 const checkCommentPermisson = async ({ facilityId, userId }) => {
     try {
-        console.log(facilityId, userId);
         const currentDate = new Date();
         const checkBooking = await Booking.findOne({ facilityId, booker: userId, status: 2, startDate: { $lte: currentDate } });
         if (!checkBooking) {

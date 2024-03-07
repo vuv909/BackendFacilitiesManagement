@@ -1,5 +1,6 @@
 import { response } from "express";
 import { notificationService } from "../services/index.js";
+
 const getNotificationByUser = async (req, res) => {
     const id = req.userId;
     const page = parseInt(req.query.page) || 1;

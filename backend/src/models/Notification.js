@@ -8,7 +8,7 @@ const Notification = mongoose.model("Notification", new Schema(
             ref: 'User' 
         },
         content: {
-            type: Number,
+            type: String,
             required: true
         },
         path: {
