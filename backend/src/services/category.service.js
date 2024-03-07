@@ -60,11 +60,6 @@ const update = async (data, imageResult) => {
         const category = data;
         if (imageResult.statusCode == 1 && imageResult.urls) {
             category.image = imageResult.urls[0];
-        }else {
-            return {
-                statusCode: 0,
-                message: "Error when upload image"
-            }
         }
         const categoryUpdate = await categoryRepository.findOne({_id: category.id});
         categoryUpdate.categoryName = category.categoryName;
