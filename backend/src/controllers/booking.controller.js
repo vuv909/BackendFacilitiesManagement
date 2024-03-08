@@ -4,6 +4,9 @@ const create = async (req, res) => {
 
     try {
         const result = await bookingService.create(req);
+        if (result.statusCode === 400) {
+            return res.status(400).json(result);
+        }
         res.status(200).json(result);
     } catch (error) {
         return res.status(500).json({

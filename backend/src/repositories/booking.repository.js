@@ -17,8 +17,9 @@ const FindAll = async (req) => {
     let { status } = req.query;
     let query = {};
     if (weeks) {
-        query = { weeks: { $regex: weeks, $options: 'i' }, status: 2 };
+        query = { weeks: { $regex: weeks, $options: 'i' }, status: 2 }
     }
+
     if (status) {
         query = { ...query, status: status };
     }
@@ -77,9 +78,8 @@ const FindAll = async (req) => {
 
         }
     }
-
-
     return arrangeSeven;
+
 }
 /*
 - lấy mảng 7 ngày; ở mỗi ngày sẽ có mảng 9 slot,  
@@ -237,8 +237,30 @@ const DeleteOne = async (req) => {
     return existedUser;
 }
 const CreateOne = async (req) => {
+    const { booker, facilityId, startDate, endDate } = req.body;
+    const checkSameBooking = await checkBooking({
+        booker: booker,
+        facilityId: facilityId,
+        startDate: { $gte: startDate },
+        endDate: { $lte: endDate },
+    });
+    if (checkSameBooking === 'found') {
+        return checkSameBooking;
+    }
     const existedUser = await Booking.create(req.body);
     return existedUser;
+}
+
+async function checkBooking(query) {
+    try {
+        const booking = await Booking.findOne(query);
+        if (booking) {
+            console.log("Booking exists:", booking);
+            return "found";
+        }
+    } catch (error) {
+        console.error("Error checking booking:", error);
+    }
 }
 
 export default {
