@@ -105,12 +105,22 @@ const isEmailInDomain = (email, domain) => {
     return regex.test(email);
 }
 
-
-export default {
-    login, FindOne, UpdateOne, FindAll
+const findCondition = async (object) => {
+    try{
+        const listUser = await userRepository.findCondition(object);
+        return {
+            statusCode: 1,
+            data: listUser
+        }
+    }catch(error){
+        return {
+            statusCode: 0,
+            error
+        }
+    }
 }
 
 
-
-
-
+export default {
+    login, FindOne, UpdateOne, FindAll, findCondition
+}
