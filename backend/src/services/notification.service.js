@@ -19,13 +19,18 @@ const createNotification = async (notification) => {
 
 const getNotificationByUserId = async ({ userId, page, size }) => {
     const startIndex = (page - 1) * size;
+    console.log(userId, page, size, "hihi");
     try {
-        const list = await Notification.find({ userId }).skip(startIndex).size(size);
+        const list = await Notification.find({ userId }).skip(startIndex).limit(size);
+        const totalPage = await Notification.countDocuments({ userId });
         return {
             statusCode: 1,
-            content: list
+            content: list,
+            totalPage: Math.ceil(totalPage/size),
+            activePage: page
         }
     } catch (error) {
+        console.log("Error: ", error);
         return {
             statusCode: 0,
             error
