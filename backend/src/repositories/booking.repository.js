@@ -29,6 +29,7 @@ const FindAll = async (req) => {
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion }).skip(startIndex).limit(size)
         .exec();
+    console.log(existedUser);
     let arrangeSeven = existedUser;
     if (weeks) {
         arrangeSeven = {
@@ -121,36 +122,28 @@ const StatusBooking = async (req) => {
     console.log(sevenDay);
     for (const day of sevenDay) {
         let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
-        let day = day.toObject();
-        if (bookingObject.status == 1) {
-            bookingObject.status = 'Pending';
-        } else if (bookingObject.status == 2) {
-            bookingObject.status = 'Accept';
-        } else if (bookingObject.status == 3) {
-            bookingObject.status = 'Reject';
-        } else if (bookingObject.status == 4) {
-            bookingObject.status = 'Expire';
-        }
+        // let day = day.toObject();
+
         if (nameDay === 'Monday') {
-            arrangeSeven.Monday.push(bookingObject);
+            arrangeSeven.Monday.push(day);
         }
         else if (nameDay === 'Tuesday') {
-            arrangeSeven.Tuesday.push(bookingObject);
+            arrangeSeven.Tuesday.push(day);
         }
         else if (nameDay === 'Wednesday') {
-            arrangeSeven.Wednesday.push(bookingObject);
+            arrangeSeven.Wednesday.push(day);
         }
         else if (nameDay === 'Thursday') {
-            arrangeSeven.Thursday.push(bookingObject);
+            arrangeSeven.Thursday.push(day);
         }
         else if (nameDay === 'Friday') {
-            arrangeSeven.Friday.push(bookingObject);
+            arrangeSeven.Friday.push(day);
         }
         else if (nameDay === 'Saturday') {
-            arrangeSeven.Saturday.push(bookingObject);
+            arrangeSeven.Saturday.push(day);
         }
         else if (nameDay === 'Sunday') {
-            arrangeSeven.Sunday.push(bookingObject);
+            arrangeSeven.Sunday.push(day);
         }
 
     }
