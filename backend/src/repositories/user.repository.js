@@ -13,12 +13,12 @@ const checkUserInDB = async (user) => {
             status: 1,
             roleId: role._id
         });
-        return newUser.populate({path: 'roleId', select: "roleName"});
-    }else{
+        return newUser.populate({ path: 'roleId', select: "roleName" });
+    } else {
         existedUser.roleId = role._id;
         await existedUser.save();
     }
-    return existedUser.populate({path: 'roleId', select: "roleName"});
+    return existedUser.populate({ path: 'roleId', select: "roleName" });
 }
 const findUser = async (id) => {
     try {
@@ -45,8 +45,18 @@ const FindAll = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    const existedUser = await User.find({}, userProjecttion).populate({ path: "roleId", select: userProjecttion }).exec();
-    return existedUser;
+
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 5;
+
+    const startIndex = (page - 1) * size;
+    const existedUser = await User.find({}, userProjecttion).populate({ path: "roleId", select: userProjecttion }).skip(startIndex).limit(size).exec();
+    let total = await User.countDocuments();
+
+    return {
+        user: existedUser, totalPage: Math.ceil(total),
+        activePage: page
+    };
 }
 
 export default {

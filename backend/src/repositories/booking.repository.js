@@ -78,7 +78,11 @@ const FindAll = async (req) => {
 
         }
     }
-    return arrangeSeven;
+    let total = await Booking.countDocuments();
+    return {
+        booking: arrangeSeven, totalPage: Math.ceil(total),
+        activePage: page
+    };
 
 }
 /*
@@ -200,22 +204,11 @@ const FindBoookingUser = async (req) => {
         totalItems: arrUser.length,
         pageSize: size
     };
-    // const updatedExistedUser = paginatedArrUser.map(booking => {
-    //     let bookingObject = booking.toObject();
-    //     if (bookingObject.status == 1) {
-    //         bookingObject.status = 'Pending';
-    //     } else if (bookingObject.status == 2) {
-    //         bookingObject.status = 'Accept';
-    //     } else if (bookingObject.status == 3) {
-    //         bookingObject.status = 'Reject';
-    //     } else if (bookingObject.status == 4) {
-    //         bookingObject.status = 'Expire';
-    //     }
-
-    //     return bookingObject;
-    // });
-    // existedUser.e;
-    return paginatedArrUser;
+    let total = arrUser.length;
+    return {
+        booking: paginatedArrUser, totalPage: Math.ceil(total),
+        activePage: page
+    };
 }
 const UpdateOne = async (req) => {
     let booking = await FindBooking(req);
@@ -255,7 +248,6 @@ async function checkBooking(query) {
     try {
         const booking = await Booking.findOne(query);
         if (booking) {
-            console.log("Booking exists:", booking);
             return "found";
         }
     } catch (error) {
