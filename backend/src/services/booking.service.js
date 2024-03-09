@@ -86,10 +86,10 @@ const create = async (req) => {
     }
 }
 const FindAll = async (req) => {
-    console.log("find all");
+
     try {
         let user = await bookingRepository.FindAll(req);
-        console.log("hello user ");
+
         return user;
     } catch (error) {
         return {
