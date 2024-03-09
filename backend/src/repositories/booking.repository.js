@@ -17,8 +17,9 @@ const FindAll = async (req) => {
     let { status } = req.query;
     let query = {};
     if (weeks) {
-        query = { weeks: { $regex: weeks, $options: 'i' }, status: 2 };
+        query = { weeks: { $regex: weeks, $options: 'i' }, status: 2 }
     }
+
     if (status) {
         query = { ...query, status: status };
     }
@@ -77,9 +78,12 @@ const FindAll = async (req) => {
 
         }
     }
+    let total = await Booking.countDocuments();
+    return {
+        booking: arrangeSeven, totalPage: Math.ceil(total),
+        activePage: page
+    };
 
-
-    return arrangeSeven;
 }
 /*
 - lấy mảng 7 ngày; ở mỗi ngày sẽ có mảng 9 slot,  
@@ -200,22 +204,11 @@ const FindBoookingUser = async (req) => {
         totalItems: arrUser.length,
         pageSize: size
     };
-    // const updatedExistedUser = paginatedArrUser.map(booking => {
-    //     let bookingObject = booking.toObject();
-    //     if (bookingObject.status == 1) {
-    //         bookingObject.status = 'Pending';
-    //     } else if (bookingObject.status == 2) {
-    //         bookingObject.status = 'Accept';
-    //     } else if (bookingObject.status == 3) {
-    //         bookingObject.status = 'Reject';
-    //     } else if (bookingObject.status == 4) {
-    //         bookingObject.status = 'Expire';
-    //     }
-
-    //     return bookingObject;
-    // });
-    // existedUser.e;
-    return paginatedArrUser;
+    let total = arrUser.length;
+    return {
+        booking: paginatedArrUser, totalPage: Math.ceil(total),
+        activePage: page
+    };
 }
 const UpdateOne = async (req) => {
     let booking = await FindBooking(req);
@@ -237,8 +230,29 @@ const DeleteOne = async (req) => {
     return existedUser;
 }
 const CreateOne = async (req) => {
+    const { booker, facilityId, startDate, endDate } = req.body;
+    const checkSameBooking = await checkBooking({
+        booker: booker,
+        facilityId: facilityId,
+        startDate: { $gte: startDate },
+        endDate: { $lte: endDate },
+    });
+    if (checkSameBooking === 'found') {
+        return checkSameBooking;
+    }
     const existedUser = await Booking.create(req.body);
     return existedUser;
+}
+
+async function checkBooking(query) {
+    try {
+        const booking = await Booking.findOne(query);
+        if (booking) {
+            return "found";
+        }
+    } catch (error) {
+        console.error("Error checking booking:", error);
+    }
 }
 
 export default {

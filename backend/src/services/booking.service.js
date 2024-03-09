@@ -67,8 +67,14 @@ const detail = async (req) => {
 const create = async (req) => {
     try {
         const result = await bookingRepository.CreateOne(req);
+        if (result === "found") {
+            return {
+                statusCode: 400,
+                message: "You already have a booking"
+            }
+        }
         return {
-            statusCode: 1,
+            statusCode: 201,
             result: result,
             message: "Created successfully"
         }
@@ -80,10 +86,10 @@ const create = async (req) => {
     }
 }
 const FindAll = async (req) => {
-    console.log("find all");
+
     try {
         let user = await bookingRepository.FindAll(req);
-        console.log("hello user ");
+
         return user;
     } catch (error) {
         return {

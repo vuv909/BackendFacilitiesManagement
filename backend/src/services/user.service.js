@@ -16,7 +16,7 @@ const login = async (credential) => {
             }
 
             const profile = verificationResponse?.payload;
-            if(!isEmailInDomain(profile?.email, 'fpt.edu.vn')){
+            if (!isEmailInDomain(profile?.email, 'fpt.edu.vn')) {
                 throw new Error("Only FPT University people can login to this system");
             }
             const user = await userRepository.checkUserInDB(profile);
@@ -76,8 +76,8 @@ const UpdateOne = async (req) => {
 }
 const FindAll = async (req) => {
     try {
+
         let user = await userRepository.FindAll(req);
-        console.log("hello user ");
         return user;
     } catch (error) {
         return {
@@ -101,8 +101,8 @@ async function verifyGoogleToken(token) {
 }
 
 const isEmailInDomain = (email, domain) => {
-	const regex = new RegExp(`@${domain}$`, 'i'); // Case-insensitive regex for the domain
-	return regex.test(email);
+    const regex = new RegExp(`@${domain}$`, 'i'); // Case-insensitive regex for the domain
+    return regex.test(email);
 }
 
 const findCondition = async (object) => {
