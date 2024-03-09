@@ -96,7 +96,13 @@ const StatusBooking = async (req) => {
         id: 0
     }
     const { id } = req.params;
+    let { weeks } = req.query
+    let query = {};
+    if (weeks) {
+        query = { weeks: { $regex: weeks, $options: 'i' } }
+    }
     let today = new Date();
+    // console.log(id);
     today.setHours(0, 0, 0, 0);
     let oneWeekFromToday = new Date(today.getTime() + 8 * 24 * 60 * 60 * 1000);
     oneWeekFromToday.setHours(0, 0, 0, 0)
@@ -108,7 +114,6 @@ const StatusBooking = async (req) => {
     // nếu ngày hôm đấy là thứ 2 thì tống cổ vào mảng của thứ 2
     // thứ 3 thì tổng cổ vào thứ 3
     // (nếu muốn rõ từng slot): thì so sánh nếu thứ đấy, vào trong if (slot 1 hay 2...) thì tống cổ vào đấy là được 
-    console.log(id);
     let arrangeSeven = {
         Monday: [],
         Tuesday: [],
@@ -118,8 +123,7 @@ const StatusBooking = async (req) => {
         Saturday: [],
         Sunday: [],
     }
-    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
-    console.log(sevenDay);
+    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
     for (const day of sevenDay) {
         let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
         // let day = day.toObject();
@@ -170,7 +174,6 @@ const FindBoookingUser = async (req) => {
         updatedAt: 0,
         id: 0
     }
-
     const { id } = req.params;
 
     const page = parseInt(req.query.page) || 1;
