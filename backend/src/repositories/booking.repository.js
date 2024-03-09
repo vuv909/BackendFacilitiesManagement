@@ -230,12 +230,14 @@ const DeleteOne = async (req) => {
     return existedUser;
 }
 const CreateOne = async (req) => {
-    const { booker, facilityId, startDate, endDate } = req.body;
+    const { booker, facilityId, weeks, weekdays, slot, status } = req.body;
     const checkSameBooking = await checkBooking({
         booker: booker,
         facilityId: facilityId,
-        startDate: { $gte: startDate },
-        endDate: { $lte: endDate },
+        weeks: weeks,
+        weekdays: weekdays,
+        slot: slot,
+        status: status
     });
     if (checkSameBooking === 'found') {
         return checkSameBooking;
