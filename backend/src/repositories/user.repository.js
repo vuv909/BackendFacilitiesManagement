@@ -41,16 +41,25 @@ const UpdateOne = async (req) => {
 }
 const FindAll = async (req) => {
     const userProjecttion = {
-        createdAt: 0,
-        updatedAt: 0,
+
         id: 0
     }
 
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
-
+    const { email, name } = req.query;
+    let query = {};
+    if (email) {
+        query = {
+            email: { $regex: email, $options: 'i' }
+        }
+    }
+    if (name) {
+        let nameQuery = { name: { $regex: name, $options: 'i' } }
+        query = { ...query, ...nameQuery }
+    }
     const startIndex = (page - 1) * size;
-    const existedUser = await User.find({}, userProjecttion).populate({ path: "roleId", select: userProjecttion }).skip(startIndex).limit(size).exec();
+    const existedUser = await User.find(query).populate({ path: "roleId", select: userProjecttion }).skip(startIndex).limit(size).exec();
     let total = await User.countDocuments();
 
     return {
