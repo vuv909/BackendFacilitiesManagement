@@ -235,7 +235,7 @@ const DeleteOne = async (req) => {
     return existedUser;
 }
 const CreateOne = async (req) => {
-    const { booker, facilityId, weeks, weekdays, slot, status } = req.body;
+    const { booker, facilityId, weeks, weekdays, slot, status, startDate, endDate } = req.body;
     const checkSameBooking = await checkBooking({
         booker: booker,
         facilityId: facilityId,
@@ -245,46 +245,46 @@ const CreateOne = async (req) => {
         status: status
     });
     let dateSlot = {};
-    let startDate = '';
-    let endDate = '';
+    let startDate2 = '';
+    let endDate2 = '';
     if (checkSameBooking === 'found') {
         return checkSameBooking;
     }
     if (slot == 'Slot1') {
-        startDate = STARTDATE_SLOT1;
-        endDate = ENDDATE_SLOT1;
+        startDate2 = STARTDATE_SLOT1;
+        endDate2 = ENDDATE_SLOT1;
     }
     else if (slot == 'Slot2') {
-        startDate = STARTDATE_SLOT2;
-        endDate = ENDDATE_SLOT2;
+        startDate2 = STARTDATE_SLOT2;
+        endDate2 = ENDDATE_SLOT2;
     }
     else if (slot == 'Slot3') {
-        startDate = STARTDATE_SLOT3;
-        endDate = ENDDATE_SLOT3;
+        startDate2 = STARTDATE_SLOT3;
+        endDate2 = ENDDATE_SLOT3;
     }
     else if (slot == 'Slot4') {
-        startDate = STARTDATE_SLOT4;
-        endDate = ENDDATE_SLOT4;
+        startDate2 = STARTDATE_SLOT4;
+        endDate2 = ENDDATE_SLOT4;
     }
     else if (slot == 'Slot5') {
-        startDate = STARTDATE_SLOT5;
-        endDate = ENDDATE_SLOT5;
+        startDate2 = STARTDATE_SLOT5;
+        endDate2 = ENDDATE_SLOT5;
     }
     else if (slot == 'Slot6') {
-        startDate = STARTDATE_SLOT6;
-        endDate = ENDDATE_SLOT6;
+        startDate2 = STARTDATE_SLOT6;
+        endDate2 = ENDDATE_SLOT6;
     }
     else if (slot == 'Slot7') {
-        startDate = STARTDATE_SLOT7;
-        endDate = ENDDATE_SLOT7;
+        startDate2 = STARTDATE_SLOT7;
+        endDate2 = ENDDATE_SLOT7;
     }
     else if (slot == 'Slot8') {
-        startDate = STARTDATE_SLOT8;
-        endDate = ENDDATE_SLOT8;
+        startDate2 = STARTDATE_SLOT8;
+        endDate2 = ENDDATE_SLOT8;
     }
     else if (slot == 'Slot9') {
-        startDate = STARTDATE_SLOT9;
-        endDate = ENDDATE_SLOT9;
+        startDate2 = STARTDATE_SLOT9;
+        endDate2 = ENDDATE_SLOT9;
     }
 
     // const today = new Date();
@@ -293,10 +293,17 @@ const CreateOne = async (req) => {
     // const formattedDate = today.toISOString().split('T')[0];
 
     // // Ghép chuỗi thời gian với ngày hôm nay
-    // const dateTimeString = formattedDate + startDate;
+    const startTimeString = startDate + startDate2;
+    const endTimeString = endDate + endDate2;
+    // console.log(startTimeString);
+    let start = new Date(startTimeString);
+    let end = new Date(endTimeString);
+    // console.log(start);
+    // console.log(end);
+
     dateSlot = {
-        startDate: startDate,
-        endDate: endDate
+        startDate: start,
+        endDate: end
     }
     const existedUser = await Booking.create({ ...req.body, ...dateSlot });
     const user = await User.findById(booker);

@@ -18,11 +18,11 @@ const BookingSchema = new Schema(
             required: false,
         },
         startDate: {
-            type: String,
+            type: Date,
             required: false,
         },
         endDate: {
-            type: String,
+            type: Date,
             required: false,
         },
         slot: {
