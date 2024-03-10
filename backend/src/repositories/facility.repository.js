@@ -17,7 +17,6 @@ const findFacility = async (id) => {
 
 const findPagination = async (startIndex, size, query) => {
     try {
-        console.log(query);
         const listFacility = await Facility.find(query).skip(startIndex).limit(size).populate({path: "category"});
         const total = await Facility.countDocuments(query);
         return {

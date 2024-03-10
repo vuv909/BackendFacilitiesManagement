@@ -7,6 +7,7 @@ import roleService from "./role.service.js";
 import notificationService from "./notification.service.js";
 import commentService from "./comment.service.js";
 import logService from "./log.service.js";
+import chatService from "./chat.service.js";
 
 export {
     userService,
@@ -17,5 +18,6 @@ export {
     roleService,
     notificationService,
     commentService,
-    logService
+    logService,
+    chatService
 }
