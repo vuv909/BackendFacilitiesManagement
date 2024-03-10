@@ -15,7 +15,6 @@ const checkUserInDB = async (user) => {
         });
         return newUser.populate({ path: 'roleId', select: "roleName" });
     } else {
-        existedUser.roleId = role._id;
         await existedUser.save();
     }
     return existedUser.populate({ path: 'roleId', select: "roleName" });
