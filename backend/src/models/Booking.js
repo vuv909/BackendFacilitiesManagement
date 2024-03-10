@@ -46,6 +46,10 @@ const BookingSchema = new Schema(
         modifiedBy: {
             type: String,
         },
+        isComment: {
+            type: Boolean,
+            default: false
+        }
     },
     {
         timestamps: true,
