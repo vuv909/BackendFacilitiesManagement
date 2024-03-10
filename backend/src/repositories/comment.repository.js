@@ -6,7 +6,7 @@ const findByCondition = async (object) => {
 }
 
 const findPagination = async ({facility, startIndex, size}) => {
-    const listComment = await Comment.find({facility}).skip(startIndex).limit(size);
+    const listComment = await Comment.find({facility}).skip(startIndex).limit(size).populate({path: 'userId'});
     const totalComments = await Comment.countDocuments({facility});
     return {
         items: listComment,
