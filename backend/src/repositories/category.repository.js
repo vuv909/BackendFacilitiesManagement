@@ -6,7 +6,6 @@ const findAll = async () => {
 }
 
 const findOne = async(object) => {
-    console.log(object);
     const category = await Category.findOne(object).exec();
     return category;
 }
