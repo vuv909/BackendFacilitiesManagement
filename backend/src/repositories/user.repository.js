@@ -54,7 +54,7 @@ const FindAll = async (req) => {
     let total = await User.countDocuments();
 
     return {
-        user: existedUser, totalPage: Math.ceil(total),
+        user: existedUser, totalPage: Math.ceil(total / size),
         activePage: page
     };
 }

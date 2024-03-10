@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Booking from '../models/Booking.js'
 import { Types } from 'mongoose';
+import { ENDDATE_SLOT1, ENDDATE_SLOT2, ENDDATE_SLOT3, ENDDATE_SLOT4, ENDDATE_SLOT5, ENDDATE_SLOT6, ENDDATE_SLOT7, ENDDATE_SLOT8, ENDDATE_SLOT9, STARTDATE_SLOT1, STARTDATE_SLOT2, STARTDATE_SLOT3, STARTDATE_SLOT4, STARTDATE_SLOT5, STARTDATE_SLOT6, STARTDATE_SLOT7, STARTDATE_SLOT8, STARTDATE_SLOT9 } from '../Enum/DateTimeSlot.js';
 
 
 
@@ -29,6 +30,7 @@ const FindAll = async (req) => {
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion }).skip(startIndex).limit(size)
         .exec();
+    console.log(existedUser);
     let arrangeSeven = existedUser;
     if (weeks) {
         arrangeSeven = {
@@ -80,7 +82,7 @@ const FindAll = async (req) => {
     }
     let total = await Booking.countDocuments();
     return {
-        booking: arrangeSeven, totalPage: Math.ceil(total),
+        booking: arrangeSeven, totalPage: Math.ceil(total / size),
         activePage: page
     };
 
@@ -95,7 +97,13 @@ const StatusBooking = async (req) => {
         id: 0
     }
     const { id } = req.params;
+    let { weeks } = req.query
+    let query = {};
+    if (weeks) {
+        query = { weeks: { $regex: weeks, $options: 'i' } }
+    }
     let today = new Date();
+    // console.log(id);
     today.setHours(0, 0, 0, 0);
     let oneWeekFromToday = new Date(today.getTime() + 8 * 24 * 60 * 60 * 1000);
     oneWeekFromToday.setHours(0, 0, 0, 0)
@@ -107,7 +115,6 @@ const StatusBooking = async (req) => {
     // nếu ngày hôm đấy là thứ 2 thì tống cổ vào mảng của thứ 2
     // thứ 3 thì tổng cổ vào thứ 3
     // (nếu muốn rõ từng slot): thì so sánh nếu thứ đấy, vào trong if (slot 1 hay 2...) thì tống cổ vào đấy là được 
-    console.log(id);
     let arrangeSeven = {
         Monday: [],
         Tuesday: [],
@@ -117,40 +124,31 @@ const StatusBooking = async (req) => {
         Saturday: [],
         Sunday: [],
     }
-    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
-    console.log(sevenDay);
+    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
     for (const day of sevenDay) {
         let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
-        let day = day.toObject();
-        if (bookingObject.status == 1) {
-            bookingObject.status = 'Pending';
-        } else if (bookingObject.status == 2) {
-            bookingObject.status = 'Accept';
-        } else if (bookingObject.status == 3) {
-            bookingObject.status = 'Reject';
-        } else if (bookingObject.status == 4) {
-            bookingObject.status = 'Expire';
-        }
+        // let day = day.toObject();
+
         if (nameDay === 'Monday') {
-            arrangeSeven.Monday.push(bookingObject);
+            arrangeSeven.Monday.push(day);
         }
         else if (nameDay === 'Tuesday') {
-            arrangeSeven.Tuesday.push(bookingObject);
+            arrangeSeven.Tuesday.push(day);
         }
         else if (nameDay === 'Wednesday') {
-            arrangeSeven.Wednesday.push(bookingObject);
+            arrangeSeven.Wednesday.push(day);
         }
         else if (nameDay === 'Thursday') {
-            arrangeSeven.Thursday.push(bookingObject);
+            arrangeSeven.Thursday.push(day);
         }
         else if (nameDay === 'Friday') {
-            arrangeSeven.Friday.push(bookingObject);
+            arrangeSeven.Friday.push(day);
         }
         else if (nameDay === 'Saturday') {
-            arrangeSeven.Saturday.push(bookingObject);
+            arrangeSeven.Saturday.push(day);
         }
         else if (nameDay === 'Sunday') {
-            arrangeSeven.Sunday.push(bookingObject);
+            arrangeSeven.Sunday.push(day);
         }
 
     }
@@ -177,7 +175,6 @@ const FindBoookingUser = async (req) => {
         updatedAt: 0,
         id: 0
     }
-
     const { id } = req.params;
 
     const page = parseInt(req.query.page) || 1;
@@ -206,7 +203,7 @@ const FindBoookingUser = async (req) => {
     };
     let total = arrUser.length;
     return {
-        booking: paginatedArrUser, totalPage: Math.ceil(total),
+        booking: paginatedArrUser, totalPage: Math.ceil(total / size),
         activePage: page
     };
 }
@@ -230,17 +227,69 @@ const DeleteOne = async (req) => {
     return existedUser;
 }
 const CreateOne = async (req) => {
-    const { booker, facilityId, startDate, endDate } = req.body;
+    const { booker, facilityId, weeks, weekdays, slot, status } = req.body;
     const checkSameBooking = await checkBooking({
         booker: booker,
         facilityId: facilityId,
-        startDate: { $gte: startDate },
-        endDate: { $lte: endDate },
+        weeks: weeks,
+        weekdays: weekdays,
+        slot: slot,
+        status: status
     });
-    if (checkSameBooking === 'found') {
+    let dateSlot = {};
+    let startDate = '';
+    let endDate = '';
+    if (slot == 1) {
+        startDate = STARTDATE_SLOT1;
+        endDate = ENDDATE_SLOT1;
+    }
+    else if (slot == 2) {
+        startDate = STARTDATE_SLOT2;
+        endDate = ENDDATE_SLOT2;
+    }
+    else if (slot == 3) {
+        startDate = STARTDATE_SLOT3;
+        endDate = ENDDATE_SLOT3;
+    }
+    else if (slot == 4) {
+        startDate = STARTDATE_SLOT4;
+        endDate = ENDDATE_SLOT4;
+    }
+    else if (slot == 5) {
+        startDate = STARTDATE_SLOT5;
+        endDate = ENDDATE_SLOT5;
+    }
+    else if (slot == 6) {
+        startDate = STARTDATE_SLOT6;
+        endDate = ENDDATE_SLOT6;
+    }
+    else if (slot == 7) {
+        startDate = STARTDATE_SLOT7;
+        endDate = ENDDATE_SLOT7;
+    }
+    else if (slot == 8) {
+        startDate = STARTDATE_SLOT8;
+        endDate = ENDDATE_SLOT8;
+    }
+    else if (slot == 9) {
+        startDate = STARTDATE_SLOT9;
+        endDate = ENDDATE_SLOT9;
+    }
+    else if (checkSameBooking === 'found') {
         return checkSameBooking;
     }
-    const existedUser = await Booking.create(req.body);
+    const today = new Date();
+
+    // Định dạng ngày hôm nay dưới dạng YYYY-MM-DD
+    const formattedDate = today.toISOString().split('T')[0];
+
+    // Ghép chuỗi thời gian với ngày hôm nay
+    const dateTimeString = formattedDate + startDate;
+    dateSlot = {
+        startDate: formattedDate + startDate,
+        endDate: formattedDate + endDate
+    }
+    const existedUser = await Booking.create({ ...req.body, ...dateSlot });
     return existedUser;
 }
 
@@ -258,3 +307,9 @@ async function checkBooking(query) {
 export default {
     FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking, FindBoookingUser
 }
+
+
+
+
+
+
