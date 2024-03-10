@@ -242,39 +242,39 @@ const CreateOne = async (req) => {
     if (checkSameBooking === 'found') {
         return checkSameBooking;
     }
-    if (slot == 'slot1') {
+    if (slot == 'Slot1') {
         startDate = STARTDATE_SLOT1;
         endDate = ENDDATE_SLOT1;
     }
-    else if (slot == 'slot2') {
+    else if (slot == 'Slot2') {
         startDate = STARTDATE_SLOT2;
         endDate = ENDDATE_SLOT2;
     }
-    else if (slot == 'slot3') {
+    else if (slot == 'Slot3') {
         startDate = STARTDATE_SLOT3;
         endDate = ENDDATE_SLOT3;
     }
-    else if (slot == 'slot4') {
+    else if (slot == 'Slot4') {
         startDate = STARTDATE_SLOT4;
         endDate = ENDDATE_SLOT4;
     }
-    else if (slot == 'slot5') {
+    else if (slot == 'Slot5') {
         startDate = STARTDATE_SLOT5;
         endDate = ENDDATE_SLOT5;
     }
-    else if (slot == 'slot6') {
+    else if (slot == 'Slot6') {
         startDate = STARTDATE_SLOT6;
         endDate = ENDDATE_SLOT6;
     }
-    else if (slot == 'slot7') {
+    else if (slot == 'Slot7') {
         startDate = STARTDATE_SLOT7;
         endDate = ENDDATE_SLOT7;
     }
-    else if (slot == 'slot8') {
+    else if (slot == 'Slot8') {
         startDate = STARTDATE_SLOT8;
         endDate = ENDDATE_SLOT8;
     }
-    else if (slot == 'slot9') {
+    else if (slot == 'Slot9') {
         startDate = STARTDATE_SLOT9;
         endDate = ENDDATE_SLOT9;
     }
