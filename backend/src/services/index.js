@@ -6,6 +6,7 @@ import bookingService from "./booking.service.js";
 import roleService from "./role.service.js";
 import notificationService from "./notification.service.js";
 import commentService from "./comment.service.js";
+import logService from "./log.service.js";
 
 export {
     userService,
@@ -15,5 +16,6 @@ export {
     bookingService,
     roleService,
     notificationService,
-    commentService
+    commentService,
+    logService
 }

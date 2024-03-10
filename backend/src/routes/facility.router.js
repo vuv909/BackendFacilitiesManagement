@@ -8,6 +8,7 @@ const facilityRouter = express.Router();
 facilityRouter.post("/create",
     [
         authJWT.verifyToken,
+        authJWT.checkRole("Admin"),
         validator.validatorFormData("img", true),
         body("name").notEmpty().withMessage("Name of facility can not be null"),
         body("name").isLength({max: 100}).withMessage("Max length of name is 100"),
@@ -20,6 +21,8 @@ facilityRouter.get("/list", facilityController.listPagination);
 facilityRouter.get("/detail/:id", facilityController.detail);
 facilityRouter.put("/update",
     [
+        authJWT.verifyToken,
+        authJWT.checkRole("Admin"),
         validator.validatorFormData("img", false),
         body("name").notEmpty().withMessage("Name of facility can not be null"),
         body("name").isLength({max: 100}).withMessage("Max length of name is 100"),
@@ -28,6 +31,6 @@ facilityRouter.put("/update",
         validator.checkError
     ],
     facilityController.update);
-facilityRouter.delete("/delete", facilityController.remove);
+facilityRouter.delete("/delete", [authJWT.verifyToken, authJWT.checkRole("Admin")], facilityController.remove);
  
 export default facilityRouter;

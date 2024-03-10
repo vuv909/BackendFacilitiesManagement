@@ -29,6 +29,10 @@ const Comment = mongoose.model("Comment", new Schema(
 		modifiedBy: {
             type: String,
         },
+        star: {
+            type: Number,
+            require: true,
+        }
 	},
 	{
 		timestamps: true
