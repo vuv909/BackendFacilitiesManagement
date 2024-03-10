@@ -5,8 +5,7 @@ import fileService from "../services/file.service.js";
 const create = async (req, res) => {
     const data = req.body;
     try{
-        const imageResult = await fileService.uploadFile(data);
-        const result = await facilityService.create(data, imageResult);
+        const result = await facilityService.create(data);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     }catch(error){
@@ -17,8 +16,7 @@ const create = async (req, res) => {
 const update = async (req, res) => {
     const data = req.body;
     try{
-        const imageResult = await fileService.uploadFile(data);
-        const result = await facilityService.update(data, imageResult);
+        const result = await facilityService.update(data);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     }catch(error){
