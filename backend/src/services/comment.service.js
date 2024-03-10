@@ -22,6 +22,12 @@ const create = async (comment, userId) => {
                 message: "You are already commented facility for this booking."
             }
         }
+        if(comment.star < 0 || comment.star > 5){
+            return {
+                statusCode: 0,
+                message: "Star is between 0 and 5"
+            }
+        }
         comment.userId = userId;
         comment.createdBy = userId;
         comment.booking = resultCheckPermission.bookingId;
@@ -34,7 +40,6 @@ const create = async (comment, userId) => {
             content: `${currentUser.name} đã comment ở: ${facility.data?.name}`,
             path: `/detail/${comment.facility}`
         }
-        console.log(notification);
         await notificationService.sendNotificationToAdmin(notification);
         newComment.populate([
             { path: 'userId' },

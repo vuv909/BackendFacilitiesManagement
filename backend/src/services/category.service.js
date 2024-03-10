@@ -1,5 +1,6 @@
 import Category from "../models/Category.js"
 import categoryRepository from "../repositories/category.repository.js";
+import logService from "./log.service.js";
 
 const create = async (data, imageResult) => {
     try {
@@ -62,9 +63,19 @@ const update = async (data, imageResult) => {
             category.image = imageResult.urls[0];
         }
         const categoryUpdate = await categoryRepository.findOne({_id: category.id});
+        const objectBefore = deepCopy(categoryUpdate);
+        const categoryExisted = await categoryRepository.findOne({categoryName: category.categoryName});
+        if(categoryExisted && !categoryExisted._id.equals(categoryUpdate._id)){
+            return {
+                statusCode: 0,
+                message: "Category name is exsited"
+            }
+        }
         categoryUpdate.categoryName = category.categoryName;
         categoryUpdate.image = category.image ? category.image : categoryUpdate.image;
         await categoryUpdate.save();
+        const objectAfter = deepCopy(categoryUpdate);
+        await logService.create({collectionName: "Category", objectBefore, objectAfter, action: "update"})
         return {
             message: "Update successfully",
             statusCode: 1,
@@ -108,6 +119,10 @@ const findOne = async (id) => {
             message: "System error!"
         }
     }
+}
+
+function deepCopy(obj) {
+    return JSON.parse(JSON.stringify(obj));
 }
 
 export default {
