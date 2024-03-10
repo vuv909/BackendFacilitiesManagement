@@ -239,55 +239,56 @@ const CreateOne = async (req) => {
     let dateSlot = {};
     let startDate = '';
     let endDate = '';
-    if (slot == 1) {
+    if (checkSameBooking === 'found') {
+        return checkSameBooking;
+    }
+    if (slot == 'slot1') {
         startDate = STARTDATE_SLOT1;
         endDate = ENDDATE_SLOT1;
     }
-    else if (slot == 2) {
+    else if (slot == 'slot2') {
         startDate = STARTDATE_SLOT2;
         endDate = ENDDATE_SLOT2;
     }
-    else if (slot == 3) {
+    else if (slot == 'slot3') {
         startDate = STARTDATE_SLOT3;
         endDate = ENDDATE_SLOT3;
     }
-    else if (slot == 4) {
+    else if (slot == 'slot4') {
         startDate = STARTDATE_SLOT4;
         endDate = ENDDATE_SLOT4;
     }
-    else if (slot == 5) {
+    else if (slot == 'slot5') {
         startDate = STARTDATE_SLOT5;
         endDate = ENDDATE_SLOT5;
     }
-    else if (slot == 6) {
+    else if (slot == 'slot6') {
         startDate = STARTDATE_SLOT6;
         endDate = ENDDATE_SLOT6;
     }
-    else if (slot == 7) {
+    else if (slot == 'slot7') {
         startDate = STARTDATE_SLOT7;
         endDate = ENDDATE_SLOT7;
     }
-    else if (slot == 8) {
+    else if (slot == 'slot8') {
         startDate = STARTDATE_SLOT8;
         endDate = ENDDATE_SLOT8;
     }
-    else if (slot == 9) {
+    else if (slot == 'slot9') {
         startDate = STARTDATE_SLOT9;
         endDate = ENDDATE_SLOT9;
     }
-    else if (checkSameBooking === 'found') {
-        return checkSameBooking;
-    }
-    const today = new Date();
 
-    // Định dạng ngày hôm nay dưới dạng YYYY-MM-DD
-    const formattedDate = today.toISOString().split('T')[0];
+    // const today = new Date();
 
-    // Ghép chuỗi thời gian với ngày hôm nay
-    const dateTimeString = formattedDate + startDate;
+    // // Định dạng ngày hôm nay dưới dạng YYYY-MM-DD
+    // const formattedDate = today.toISOString().split('T')[0];
+
+    // // Ghép chuỗi thời gian với ngày hôm nay
+    // const dateTimeString = formattedDate + startDate;
     dateSlot = {
-        startDate: formattedDate + startDate,
-        endDate: formattedDate + endDate
+        startDate: startDate,
+        endDate: endDate
     }
     const existedUser = await Booking.create({ ...req.body, ...dateSlot });
     return existedUser;
