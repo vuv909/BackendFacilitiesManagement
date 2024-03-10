@@ -45,9 +45,7 @@ const sendNotificationToAdmin = async (notification) => {
             const listUser = await userService.findCondition({ roleId: adminRole.content._id });
             listUser.data.forEach(async (user) => {
                 notification.userId = user._id;
-                console.log(notification);
                 const newNotification = await Notification.create(notification);
-                console.log(newNotification);
             })
         } else {
             return {
