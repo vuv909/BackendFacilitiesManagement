@@ -13,7 +13,7 @@ const create = async (req, res) => {
 }
 
 const checkCommentPermisson = async (req, res) => {
-    const { facilityId } = req.param;
+    const { facilityId } = req.query;
     const userId = req.userID;
     try {
         const result = await commentService.checkCommentPermisson({ facilityId, userId });

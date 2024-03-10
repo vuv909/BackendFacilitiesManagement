@@ -4,19 +4,18 @@ import commentRepository from "../repositories/comment.repository.js";
 import userRepository from "../repositories/user.repository.js";
 import facilityService from "./facility.service.js";
 import notificationService from "./notification.service.js";
-import userService from "./user.service.js";
 
 const create = async (comment, userId) => {
     try {
         const resultCheckPermission = await checkCommentPermisson({facilityId: comment.facility, userId});
-        console.log(userId);
         if(resultCheckPermission.statusCode === 0){
             return {
                 statusCode: 0,
-                message: "You only can comment after using facility."
+                message: "You only can comment after using facility with each booking request."
             }
         }
-        const existedComment = await Comment.findOne({ booking: comment.booking });
+        const booking = await Booking.findById(resultCheckPermission.bookingId);
+        const existedComment = await Comment.findOne({ booking: resultCheckPermission.bookingId });
         if (existedComment) {
             return {
                 statusCode: 0,
@@ -25,9 +24,12 @@ const create = async (comment, userId) => {
         }
         comment.userId = userId;
         comment.createdBy = userId;
+        comment.booking = resultCheckPermission.bookingId;
         const newComment = await Comment.create(comment);
         const currentUser = await userRepository.findUser(userId);
         const facility = await facilityService.detail(comment.facility);
+        booking.isComment = true;
+        await booking.save();
         const notification = {
             content: `${currentUser.name} đã comment ở: ${facility.data?.name}`,
             path: `/detail/${comment.facility}`
@@ -53,18 +55,21 @@ const create = async (comment, userId) => {
 
 const checkCommentPermisson = async ({ facilityId, userId }) => {
     try {
-        const currentDate = new Date();
-        const checkBooking = await Booking.findOne({ facilityId, booker: userId, status: 2, startDate: { $lte: currentDate } });
+        const currentDate = new Date(); 
+        const checkBooking = await Booking.findOne({ facilityId, booker: userId, status: 2, isComment: false, startDate: { $lte: currentDate } });
+        const totalComment = await Booking.countDocuments({ facilityId, booker: userId, status: 2, isComment: false, startDate: { $lte: currentDate } });
         if (!checkBooking) {
             return {
                 statusCode: 0,
-                message: "You only can comment after using facility.",
-                data: false
+                message: "You only can comment after using facility with each booking request.",
+                data: false,
+                totalCommentPermission: totalComment
             }
         }
         return {
             statusCode: 1,
-            data: true
+            data: true,
+            bookingId: checkBooking._id
         }
     } catch (error) {
         return {
