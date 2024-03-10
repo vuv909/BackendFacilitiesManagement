@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Booking from '../models/Booking.js'
 import { Types } from 'mongoose';
+import { ENDDATE_SLOT1, ENDDATE_SLOT2, ENDDATE_SLOT3, ENDDATE_SLOT4, ENDDATE_SLOT5, ENDDATE_SLOT6, ENDDATE_SLOT7, ENDDATE_SLOT8, ENDDATE_SLOT9, STARTDATE_SLOT1, STARTDATE_SLOT2, STARTDATE_SLOT3, STARTDATE_SLOT4, STARTDATE_SLOT5, STARTDATE_SLOT6, STARTDATE_SLOT7, STARTDATE_SLOT8, STARTDATE_SLOT9 } from '../Enum/DateTimeSlot.js';
 
 
 
@@ -81,7 +82,7 @@ const FindAll = async (req) => {
     }
     let total = await Booking.countDocuments();
     return {
-        booking: arrangeSeven, totalPage: Math.ceil(total),
+        booking: arrangeSeven, totalPage: Math.ceil(total / size),
         activePage: page
     };
 
@@ -202,7 +203,7 @@ const FindBoookingUser = async (req) => {
     };
     let total = arrUser.length;
     return {
-        booking: paginatedArrUser, totalPage: Math.ceil(total),
+        booking: paginatedArrUser, totalPage: Math.ceil(total / size),
         activePage: page
     };
 }
@@ -235,10 +236,60 @@ const CreateOne = async (req) => {
         slot: slot,
         status: status
     });
-    if (checkSameBooking === 'found') {
+    let dateSlot = {};
+    let startDate = '';
+    let endDate = '';
+    if (slot == 1) {
+        startDate = STARTDATE_SLOT1;
+        endDate = ENDDATE_SLOT1;
+    }
+    else if (slot == 2) {
+        startDate = STARTDATE_SLOT2;
+        endDate = ENDDATE_SLOT2;
+    }
+    else if (slot == 3) {
+        startDate = STARTDATE_SLOT3;
+        endDate = ENDDATE_SLOT3;
+    }
+    else if (slot == 4) {
+        startDate = STARTDATE_SLOT4;
+        endDate = ENDDATE_SLOT4;
+    }
+    else if (slot == 5) {
+        startDate = STARTDATE_SLOT5;
+        endDate = ENDDATE_SLOT5;
+    }
+    else if (slot == 6) {
+        startDate = STARTDATE_SLOT6;
+        endDate = ENDDATE_SLOT6;
+    }
+    else if (slot == 7) {
+        startDate = STARTDATE_SLOT7;
+        endDate = ENDDATE_SLOT7;
+    }
+    else if (slot == 8) {
+        startDate = STARTDATE_SLOT8;
+        endDate = ENDDATE_SLOT8;
+    }
+    else if (slot == 9) {
+        startDate = STARTDATE_SLOT9;
+        endDate = ENDDATE_SLOT9;
+    }
+    else if (checkSameBooking === 'found') {
         return checkSameBooking;
     }
-    const existedUser = await Booking.create(req.body);
+    const today = new Date();
+
+    // Định dạng ngày hôm nay dưới dạng YYYY-MM-DD
+    const formattedDate = today.toISOString().split('T')[0];
+
+    // Ghép chuỗi thời gian với ngày hôm nay
+    const dateTimeString = formattedDate + startDate;
+    dateSlot = {
+        startDate: formattedDate + startDate,
+        endDate: formattedDate + endDate
+    }
+    const existedUser = await Booking.create({ ...req.body, ...dateSlot });
     return existedUser;
 }
 
@@ -256,3 +307,9 @@ async function checkBooking(query) {
 export default {
     FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking, FindBoookingUser
 }
+
+
+
+
+
+
