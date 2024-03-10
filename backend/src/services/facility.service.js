@@ -3,24 +3,26 @@ import Booking from "../models/Booking.js";
 import Comment from "../models/Comment.js";
 import Facility from "../models/Facility.js"
 import facilityRepository from "../repositories/facility.repository.js";
-import { categoryService } from "../services/index.js"
+import { categoryService, fileService, logService } from "../services/index.js"
+import deepCopy from "../utils/index.js";
 
-const create = async (data, imageResult) => {
+const create = async (data) => {
     try {
         const facility = data;
+        const existedFacility = await Facility.find({ name: facility?.name });
+        if (existedFacility && existedFacility.length > 0) {
+            return {
+                statusCode: 0,
+                message: "Already exsited facility"
+            }
+        }
+        const imageResult = await fileService.uploadFile(data);
         if (imageResult.statusCode == 1 && imageResult.urls) {
             facility.image = imageResult.urls[0];
         } else {
             return {
                 statusCode: 0,
                 message: "Error when upload image"
-            }
-        }
-        const existedFacility = await Facility.find({ name: facility?.name });
-        if (existedFacility && existedFacility.length > 0) {
-            return {
-                statusCode: 0,
-                message: "Already exsited facility"
             }
         }
         const newFacility = await Facility.create(facility);
@@ -36,18 +38,27 @@ const create = async (data, imageResult) => {
         }
     }
 }
-const update = async (data, imageResult) => {
+const update = async (data) => {
     const facility = data;
-    if (imageResult.statusCode == 1 && imageResult.urls) {
-        facility.image = imageResult.urls[0];
-    }
     try {
         const existedFacility = await Facility.findById(facility?.id);
+        const objectBefore = deepCopy(existedFacility);
         if (!existedFacility) {
             return {
                 statusCode: 0,
                 message: "Facility not existed"
             }
+        }
+        const existedName = await Facility.findOne({name: facility.name});
+        if(existedName && !existedName._id.equals(existedFacility._id)){
+            return {
+                statusCode: 0,
+                message: "Facility name is exsited"
+            }
+        }
+        const imageResult = await fileService.uploadFile(data);
+        if (imageResult.statusCode == 1 && imageResult.urls) {
+            facility.image = imageResult.urls[0];
         }
         existedFacility.name = facility.name;
         existedFacility.description = facility.description;
@@ -56,6 +67,8 @@ const update = async (data, imageResult) => {
         existedFacility.category = facility.category;
         existedFacility.image = facility.image ? facility.image : existedFacility.image;
         await existedFacility.save();
+        const objectAfter = deepCopy(existedFacility);
+        await logService.create({collectionName: "Facility", objectBefore, objectAfter, action: "update"})
         return {
             statusCode: 1,
             message: "Updated successfully",

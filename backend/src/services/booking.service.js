@@ -26,8 +26,6 @@ const update = async (req) => {
 }
 
 const deleteOne = async (req) => {
-
-
     try {
         const result = await bookingRepository.DeleteOne(req);
         if (result == null) {
