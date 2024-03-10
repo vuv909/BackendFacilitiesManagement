@@ -22,10 +22,10 @@ const create = async (comment, userId) => {
                 message: "You are already commented facility for this booking."
             }
         }
-        if(comment.star < 0 || comment.star > 5){
+        if(comment.star < 1 || comment.star > 5){
             return {
                 statusCode: 0,
-                message: "Star is between 0 and 5"
+                message: "Star is between 1 and 5"
             }
         }
         comment.userId = userId;

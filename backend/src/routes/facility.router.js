@@ -18,6 +18,7 @@ facilityRouter.post("/create",
     ],
     facilityController.create);
 facilityRouter.get("/list", facilityController.listPagination);
+facilityRouter.get("/list-dashboard", facilityController.listDashboard);
 facilityRouter.get("/detail/:id", facilityController.detail);
 facilityRouter.put("/update",
     [
