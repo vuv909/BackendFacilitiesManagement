@@ -79,7 +79,7 @@ const update = async (data) => {
         categoryUpdate.image = category.image ? category.image : categoryUpdate.image;
         await categoryUpdate.save();
         const objectAfter = deepCopy(categoryUpdate);
-        await logService.create({collectionName: "Category", objectBefore, objectAfter, action: "update"})
+        await logService.create({collectionName: "Category", objectBefore, objectAfter, action: "update", id: categoryUpdate._id})
         return {
             message: "Update successfully",
             statusCode: 1,

@@ -10,6 +10,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { Server } from 'socket.io'
 import http from 'http';
 import cron from 'node-cron'
+import bookingService from './services/booking.service.js'
 
 dotenv.config()
 const app = express()
@@ -76,8 +77,9 @@ socketIo.on('connection', (socket) => {
 });
 
 // cron job for run every day at 00:00
-cron.schedule('0 0 * * *', () => {
-    console.log("Run at 00:00 to cancel request expried!");
+cron.schedule('3 0 * * *', async () => {
+    console.log("Start clean booking expried!!!");
+    await bookingService.CheckExpireBooking();
 })
 
 // handling catch error

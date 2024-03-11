@@ -140,7 +140,7 @@ const CheckExpireBooking = async () => {
     try {
         const updateResult = await Booking.updateMany(
             { 'startDate': { $lte: new Date() } },
-            { $set: { 'status': 3 } }
+            { $set: { 'status': 3, reason: "Quá hạn" } },
         );
         return updateResult;
     } catch (err) {
@@ -149,5 +149,6 @@ const CheckExpireBooking = async () => {
 }
 export default {
     create,
-    update, FindAll, deleteOne, detail, statusBooking, FindBoookinUser
+    update, FindAll, deleteOne, detail, statusBooking, FindBoookinUser,
+    CheckExpireBooking
 }

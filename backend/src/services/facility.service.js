@@ -68,7 +68,7 @@ const update = async (data) => {
         existedFacility.image = facility.image ? facility.image : existedFacility.image;
         await existedFacility.save();
         const objectAfter = deepCopy(existedFacility);
-        await logService.create({collectionName: "Facility", objectBefore, objectAfter, action: "update"})
+        await logService.create({collectionName: "Facility", objectBefore, objectAfter, action: "update", id: existedFacility._id})
         return {
             statusCode: 1,
             message: "Updated successfully",
