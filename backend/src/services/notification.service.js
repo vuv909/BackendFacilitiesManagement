@@ -19,15 +19,16 @@ const createNotification = async (notification) => {
 
 const getNotificationByUserId = async ({ userId, page, size }) => {
     const startIndex = (page - 1) * size;
-    console.log(userId, page, size, "hihi");
     try {
         const list = await Notification.find({ userId }).skip(startIndex).limit(size);
         const totalPage = await Notification.countDocuments({ userId });
+        const totalNotifcationNotRead = await Notification.countDocuments({ userId, read: false });
         return {
             statusCode: 1,
             content: list,
             totalPage: Math.ceil(totalPage / size),
-            activePage: page
+            activePage: page,
+            totalNotRead: totalNotifcationNotRead
         }
     } catch (error) {
         console.log("Error: ", error);
@@ -65,7 +66,7 @@ const updateNotificationToRead = async (notificationId) => {
     try {
         console.log(notificationId);
         const notification = await Notification.findById(notificationId);
-        if(!notification){
+        if (!notification) {
             return {
                 statusCode: 0,
                 message: "Notification not existed"
