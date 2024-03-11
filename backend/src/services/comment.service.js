@@ -38,7 +38,8 @@ const create = async (comment, userId) => {
         await booking.save();
         const notification = {
             content: `${currentUser.name} đã comment ở: ${facility.data?.name}`,
-            path: `/detail/${comment.facility}`
+            path: `/detail/${comment.facility}`,
+            name: currentUser.name
         }
         await notificationService.sendNotificationToAdmin(notification);
         newComment.populate([

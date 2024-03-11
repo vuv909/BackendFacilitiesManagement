@@ -13,6 +13,14 @@ const Notification = mongoose.model("Notification", new Schema(
         },
         path: {
             type: String,
+        },
+        name: {
+            type: String,
+        },
+        read: {
+            type: Boolean,
+            require: true,
+            default: false
         }
     },
     {

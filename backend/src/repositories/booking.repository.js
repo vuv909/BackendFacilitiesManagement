@@ -217,10 +217,12 @@ const UpdateOne = async (req) => {
     const { id } = req.params;
     const existedUser = await Booking.findByIdAndUpdate(id, req.body, { new: true }).exec();
     const message = req.body.status === 2 ? "Yêu cầu của bạn đã được phê duyệt" : "Yêu cầu của bạn đã bị từ chối";
+    const user = await User.findById(existedUser.booker);
     const notification = {
         userId: existedUser.booker,
         content: message,
-        path: '/historyBooking'
+        path: '/historyBooking',
+        name: user.name
     }
     await notificationService.createNotification(notification);
     return existedUser;
@@ -286,7 +288,6 @@ const CreateOne = async (req) => {
         startDate2 = STARTDATE_SLOT9;
         endDate2 = ENDDATE_SLOT9;
     }
-
     // const today = new Date();
 
     // // Định dạng ngày hôm nay dưới dạng YYYY-MM-DD
@@ -305,14 +306,16 @@ const CreateOne = async (req) => {
         startDate: start,
         endDate: end
     }
+
     const existedUser = await Booking.create({ ...req.body, ...dateSlot });
     const user = await User.findById(booker);
     const facility = await Facility.findById(facilityId);
     const notification = {
-        userId: booker,
         content: `${user.name} đã đặt phòng: ${facility.name}`,
-        path: '/dashboard'
+        path: '/dashboard',
+        name: user.name
     }
+    console.log("Notification: ", notification);
     await notificationService.sendNotificationToAdmin(notification);
     return existedUser;
 }

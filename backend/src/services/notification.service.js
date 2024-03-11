@@ -26,7 +26,7 @@ const getNotificationByUserId = async ({ userId, page, size }) => {
         return {
             statusCode: 1,
             content: list,
-            totalPage: Math.ceil(totalPage/size),
+            totalPage: Math.ceil(totalPage / size),
             activePage: page
         }
     } catch (error) {
@@ -61,8 +61,34 @@ const sendNotificationToAdmin = async (notification) => {
     }
 }
 
+const updateNotificationToRead = async (notificationId) => {
+    try {
+        console.log(notificationId);
+        const notification = await Notification.findById(notificationId);
+        if(!notification){
+            return {
+                statusCode: 0,
+                message: "Notification not existed"
+            }
+        }
+        notification.read = true;
+        await notification.save();
+        return {
+            statusCode: 1,
+            data: notification
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: 0,
+            message: "System error"
+        }
+    }
+}
+
 export default {
     createNotification,
     getNotificationByUserId,
-    sendNotificationToAdmin
+    sendNotificationToAdmin,
+    updateNotificationToRead
 }

@@ -6,7 +6,18 @@ const getNotificationByUser = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
     try {
-        const result = await notificationService.getNotificationByUserId({userId: id, page, size});
+        const result = await notificationService.getNotificationByUserId({ userId: id, page, size });
+        const code = result.statusCode === 1 ? 200 : 500;
+        return res.status(code).json(result);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+}
+
+const updateNotificationToRead = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await notificationService.updateNotificationToRead(id);
         const code = result.statusCode === 1 ? 200 : 500;
         return res.status(code).json(result);
     } catch (error) {
@@ -15,5 +26,6 @@ const getNotificationByUser = async (req, res) => {
 }
 
 export default {
-    getNotificationByUser
+    getNotificationByUser,
+    updateNotificationToRead
 }
