@@ -8,6 +8,7 @@ import { notificationService } from '../services/index.js';
 import Notification from '../models/Notification.js';
 
 const FindAll = async (req) => {
+
     const userProjecttion = {
         createdAt: 0,
         updatedAt: 0,
@@ -32,7 +33,6 @@ const FindAll = async (req) => {
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion }).skip(startIndex).limit(size)
         .exec();
-    console.log(existedUser);
     let arrangeSeven = existedUser;
     if (weeks) {
         arrangeSeven = {

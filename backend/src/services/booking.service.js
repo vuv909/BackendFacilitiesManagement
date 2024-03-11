@@ -5,6 +5,16 @@ import bookingRepository from '../repositories/booking.repository.js'
 const update = async (req) => {
 
     try {
+        const { status, reason } = req.body;
+        // nếu reject thì cần lý do nhé 
+        if (status === 3) {
+            if (!reason) {
+                return {
+                    statusCode: 400,
+                    message: "What is the reason that you want to reject ?  "
+                }
+            }
+        }
         const result = await bookingRepository.UpdateOne(req);
         if (result == null) {
             return {
@@ -64,6 +74,7 @@ const detail = async (req) => {
 
 const create = async (req) => {
     try {
+
         const result = await bookingRepository.CreateOne(req);
         if (result === "found") {
             return {
@@ -87,7 +98,6 @@ const FindAll = async (req) => {
 
     try {
         let user = await bookingRepository.FindAll(req);
-
         return user;
     } catch (error) {
         return {
@@ -110,7 +120,6 @@ const statusBooking = async (req) => {
     }
 }
 const FindBoookinUser = async (req) => {
-    console.log("statusBooking");
     try {
         let user = await bookingRepository.FindBoookingUser(req);
         return user;
@@ -119,6 +128,23 @@ const FindBoookinUser = async (req) => {
             message: "Error",
             content: error.toString()
         }
+    }
+}
+
+// Unit test
+// test danh sách không có gì, hết, ít , xem có lỗi ko 
+// tên hàm: chuyênr trạng thái của booking < ngày hôm nay sang status reject 
+// tham số bookings: mảng booking muốn check;
+
+const CheckExpireBooking = async () => {
+    try {
+        const updateResult = await Booking.updateMany(
+            { 'startDate': { $lte: new Date() } },
+            { $set: { 'status': 3 } }
+        );
+        return updateResult;
+    } catch (err) {
+        console.error(err);
     }
 }
 export default {
