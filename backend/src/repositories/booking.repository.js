@@ -6,6 +6,7 @@ import { ENDDATE_SLOT1, ENDDATE_SLOT2, ENDDATE_SLOT3, ENDDATE_SLOT4, ENDDATE_SLO
 
 
 const FindAll = async (req) => {
+
     const userProjecttion = {
         createdAt: 0,
         updatedAt: 0,
@@ -30,7 +31,6 @@ const FindAll = async (req) => {
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion }).skip(startIndex).limit(size)
         .exec();
-    console.log(existedUser);
     let arrangeSeven = existedUser;
     if (weeks) {
         arrangeSeven = {

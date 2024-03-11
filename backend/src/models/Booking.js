@@ -35,6 +35,9 @@ const BookingSchema = new Schema(
         weekdays: {
             type: String,
         },
+        reason: {
+            type: String,
+        },
         status: {
             type: Number,
             required: false,
