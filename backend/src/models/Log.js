@@ -15,6 +15,9 @@ const Log = mongoose.model("Log", new Schema(
         },
         action: {
             type: String
+        },
+        id: {
+            type: String
         }
 	},
 	{
