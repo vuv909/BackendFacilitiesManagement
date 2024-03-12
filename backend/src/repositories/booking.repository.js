@@ -14,32 +14,45 @@ const FindAll = async (req) => {
         updatedAt: 0,
         id: 0
     }
+    // Xử lý thông tin sort
+    let sortOptions = {};
+    const { sort, role, status, weeks } = req.query;
+    if (sort) {
+        const sortFields = Array.isArray(sort) ? sort : [sort];
+        sortFields.forEach(sortField => {
+            const [field, order] = sortField.split(':');
+            sortOptions[field] = (order === 'asc' ? 1 : -1);
+        });
+    }
+    console.log(sortOptions);
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
     const startIndex = (page - 1) * size;
-    let { weeks } = req.query
-    let { status } = req.query;
     let query = {};
+
     if (weeks) {
         query = { weeks: { $regex: weeks, $options: 'i' }, status: 2 }
     }
-
+    console.log({ "_id": role });
     if (status) {
         query = { ...query, status: status };
     }
 
-    const existedUser = await Booking.find(query, userProjecttion)
+    let existedUser = await Booking.find(query)
         .populate({
             path: 'booker',
             select: userProjecttion,
-            populate: { path: 'roleId', select: userProjecttion } // Thêm thông tin về vai trò trực tiếp vào đối tượng booker
+            populate: {
+                path: 'roleId',
+                select: userProjecttion,
+            }
         })
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion })
         .skip(startIndex)
         .limit(size)
+        .sort(sortOptions)
         .exec();
-    let arrangeSeven = existedUser;
     if (weeks) {
         arrangeSeven = {
             Monday: [],
@@ -80,7 +93,19 @@ const FindAll = async (req) => {
     }
     let total = await Booking.countDocuments(query);
 
-    console.log(total);
+    let filter = [];
+    if (role) {
+        const roleId = new mongoose.Types.ObjectId(role);
+        for (const book of existedUser) {
+            if (book.booker && book.booker.roleId['_id'].equals(roleId)) {
+                filter.push(book)
+            }
+        }
+        existedUser = filter;
+        total = filter.length;
+    }
+
+    let arrangeSeven = existedUser;
     return {
         booking: arrangeSeven, totalPage: Math.ceil(total / size),
         activePage: page
