@@ -75,11 +75,22 @@ const listDashboard = async (req, res) => {
     }
 }
 
+const getListFacilityByCategory = async(req, res) => {
+    try{
+        const result = await facilityService.getFacilityByCategory();
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    }catch(error){
+        return res.status(500).json(error);
+    }
+}
+
 export default {
     create,
     update,
     remove,
     detail,
     listPagination,
-    listDashboard
+    listDashboard,
+    getListFacilityByCategory
 }

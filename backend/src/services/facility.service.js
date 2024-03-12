@@ -1,5 +1,6 @@
 import { SCORE_ASC, SCORE_DESC, TOTAL_BOOKED_ASC, TOTAL_BOOKED_DESC } from "../Enum/SortFacility.js";
 import Booking from "../models/Booking.js";
+import Category from "../models/Category.js";
 import Comment from "../models/Comment.js";
 import Facility from "../models/Facility.js"
 import facilityRepository from "../repositories/facility.repository.js";
@@ -213,8 +214,26 @@ const listDashboard = async (page, size, name, categoryId, sort) => {
     }
 }
 
-const getListFacilityByTime = async (startDate, startTime) => {
-
+const getFacilityByCategory = async () => {
+    try {
+        const categoryList = await Category.find();
+        const promises = categoryList.map(async (category) => {
+            const countFacility = await Facility.countDocuments({ category: category._id });
+            return { [category.categoryName]: countFacility };
+        });
+        const resultArray = await Promise.all(promises);
+        const newObject = Object.assign({}, ...resultArray);        
+        return {
+            statusCode: 1,
+            data: newObject
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: 0,
+            message: "System error"
+        }
+    }
 }
 
 export default {
@@ -223,5 +242,6 @@ export default {
     remove,
     detail,
     listPagination,
-    listDashboard
+    listDashboard,
+    getFacilityByCategory
 }

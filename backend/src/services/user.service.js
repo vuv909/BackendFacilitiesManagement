@@ -1,6 +1,8 @@
 import { OAuth2Client } from 'google-auth-library'
 import jwt from 'jsonwebtoken'
 import { userRepository } from '../repositories/index.js';
+import Role from '../models/Role.js';
+import User from '../models/User.js';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -106,13 +108,13 @@ const isEmailInDomain = (email, domain) => {
 }
 
 const findCondition = async (object) => {
-    try{
+    try {
         const listUser = await userRepository.findCondition(object);
         return {
             statusCode: 1,
             data: listUser
         }
-    }catch(error){
+    } catch (error) {
         return {
             statusCode: 0,
             error
@@ -120,7 +122,28 @@ const findCondition = async (object) => {
     }
 }
 
+const getListUserByRole = async () => {
+    try {
+        const listRole = await Role.find();
+        const promises = listRole.map(async (role) => {
+            const countUser = await User.countDocuments({ roleId: role._id });
+            return { [role.roleName]: countUser };
+        });
+        const resultArray = await Promise.all(promises);
+        const newObject = Object.assign({}, ...resultArray);
+        return {
+            statusCode: 1,
+            data: newObject
+        }
+    } catch (error) {
+        console.error(error);
+        return {
+            statusCode: 0,
+            message: "System error!"
+        }
+    }
+}
 
 export default {
-    login, FindOne, UpdateOne, FindAll, findCondition
+    login, FindOne, UpdateOne, FindAll, findCondition,getListUserByRole
 }
