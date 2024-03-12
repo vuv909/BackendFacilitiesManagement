@@ -12,9 +12,10 @@ const login = async (credential) => {
         if (credential) {
             const verificationResponse = await verifyGoogleToken(credential);
             if (verificationResponse.error) {
-                return res.status(400).json({
+                return {
+                    statusCode: 0,
                     message: verificationResponse.error,
-                });
+                }
             }
 
             const profile = verificationResponse?.payload;
@@ -22,7 +23,15 @@ const login = async (credential) => {
                 throw new Error("Only FPT University people can login to this system");
             }
             const user = await userRepository.checkUserInDB(profile);
+            console.log(user, "user");
+            if(user.status === 3){
+                return {
+                    statusCode: 0,
+                    message: "Account is banned"
+                }
+            }
             return {
+                statusCode: 1,
                 message: "Login was successful",
                 token: {
                     token: jwt.sign({

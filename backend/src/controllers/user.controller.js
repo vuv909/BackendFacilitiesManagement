@@ -5,9 +5,9 @@ const login = async (req, res) => {
     const credentital = req.body.credential;
     try {
         const response = await userService.login(credentital);
-        return res.status(200).json(response);
+        const statusCode = response.statusCode == 1 ? 200 : 400;
+        return res.status(statusCode).json(response);
     } catch (error) {
-        console.log("error", error.toString());
         return res.status(500).json({
             error: error?.message || error.toString(),
         });
