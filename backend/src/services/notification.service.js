@@ -20,7 +20,7 @@ const createNotification = async (notification) => {
 const getNotificationByUserId = async ({ userId, page, size }) => {
     const startIndex = (page - 1) * size;
     try {
-        const list = await Notification.find({ userId }).skip(startIndex).limit(size);
+        const list = await Notification.find({ userId }).sort({createdAt: -1}).skip(startIndex).limit(size);
         const totalPage = await Notification.countDocuments({ userId });
         const totalNotifcationNotRead = await Notification.countDocuments({ userId, read: false });
         return {
