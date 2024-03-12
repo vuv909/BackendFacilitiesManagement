@@ -49,8 +49,8 @@ const update = async (data) => {
                 message: "Facility not existed"
             }
         }
-        const existedName = await Facility.findOne({name: facility.name});
-        if(existedName && !existedName._id.equals(existedFacility._id)){
+        const existedName = await Facility.findOne({ name: facility.name });
+        if (existedName && !existedName._id.equals(existedFacility._id)) {
             return {
                 statusCode: 0,
                 message: "Facility name is exsited"
@@ -68,7 +68,7 @@ const update = async (data) => {
         existedFacility.image = facility.image ? facility.image : existedFacility.image;
         await existedFacility.save();
         const objectAfter = deepCopy(existedFacility);
-        await logService.create({collectionName: "Facility", objectBefore, objectAfter, action: "update", id: existedFacility._id})
+        await logService.create({ collectionName: "Facility", objectBefore, objectAfter, action: "update", id: existedFacility._id })
         return {
             statusCode: 1,
             message: "Updated successfully",
@@ -154,14 +154,14 @@ const listPagination = async (page, size, name, categoryId) => {
 
 
 const listDashboard = async (page, size, name, categoryId, sort) => {
-    const startIndex = (page - 1) * size;
+    const startIndex = (page - 1) * size <= 0 ? 0 : (page - 1) * size - 1;
     const category = await categoryService.findOne(categoryId);
     const query = { name: { $regex: name, $options: 'i' } };
     if (category.statusCode == 1) {
         query.category = categoryId;
     }
     try {
-        const listFacility = await facilityRepository.findPagination(startIndex, size, query);
+        const listFacility = await facilityRepository.findPagination(0, 100000, query);
         const newListFacility = await Promise.all(listFacility.items.map(async (item) => {
             const planObject = item.toObject();
             const comments = await Comment.find({ facility: item._id });
@@ -171,9 +171,10 @@ const listDashboard = async (page, size, name, categoryId, sort) => {
             } else {
                 planObject.score = 0;
                 const totalStar = comments.reduce((accumlator, currentObject) => {
+                    console.log(accumlator);
                     currentObject.star = currentObject.star ? currentObject.star : 0;
-                    return accumlator.star + currentObject.star;
-                })
+                    return accumlator + currentObject.star;
+                }, 0)
                 planObject.score = totalStar / comments.length;
             }
             planObject.totalBooked = bookings.length;
@@ -181,25 +182,26 @@ const listDashboard = async (page, size, name, categoryId, sort) => {
         }))
         switch (sort) {
             case SCORE_ASC:
-                newListFacility.sort((a,b) => a.score - b.score);
+                newListFacility.sort((a, b) => a.score - b.score);
                 break;
             case SCORE_DESC:
-                newListFacility.sort((a,b) => b.score - a.score);
+                newListFacility.sort((a, b) => b.score - a.score);
                 break;
             case TOTAL_BOOKED_ASC:
-                newListFacility.sort((a,b) => a.totalBooked - b.totalBooked);
+                newListFacility.sort((a, b) => a.totalBooked - b.totalBooked);
                 break;
             case TOTAL_BOOKED_DESC:
-                newListFacility.sort((a,b) => b.totalBooked - a.totalBooked);
+                newListFacility.sort((a, b) => b.totalBooked - a.totalBooked);
                 break;
             default:
-                newListFacility.sort((a,b) => b.score - a.score);
+                newListFacility.sort((a, b) => b.score - a.score);
                 break;
         }
+        const listFacilityPag = newListFacility.slice(startIndex, startIndex + size + 1);
         return {
             statusCode: 1,
             message: "Get data successfully",
-            items: newListFacility,
+            items: listFacilityPag,
             totalPage: Math.ceil(listFacility.total / size),
             activePage: page
         }
