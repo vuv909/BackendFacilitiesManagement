@@ -154,7 +154,8 @@ const listPagination = async (page, size, name, categoryId) => {
 
 
 const listDashboard = async (page, size, name, categoryId, sort) => {
-    const startIndex = (page - 1) * size <= 0 ? 0 : (page - 1) * size - 1;
+    const startIndex = (page - 1) * size;
+    console.log(startIndex);
     const category = await categoryService.findOne(categoryId);
     const query = { name: { $regex: name, $options: 'i' } };
     if (category.statusCode == 1) {
@@ -171,7 +172,6 @@ const listDashboard = async (page, size, name, categoryId, sort) => {
             } else {
                 planObject.score = 0;
                 const totalStar = comments.reduce((accumlator, currentObject) => {
-                    console.log(accumlator);
                     currentObject.star = currentObject.star ? currentObject.star : 0;
                     return accumlator + currentObject.star;
                 }, 0)
@@ -197,7 +197,7 @@ const listDashboard = async (page, size, name, categoryId, sort) => {
                 newListFacility.sort((a, b) => b.score - a.score);
                 break;
         }
-        const listFacilityPag = newListFacility.slice(startIndex, startIndex + size + 1);
+        const listFacilityPag = newListFacility.slice(startIndex, startIndex + size);
         return {
             statusCode: 1,
             message: "Get data successfully",
