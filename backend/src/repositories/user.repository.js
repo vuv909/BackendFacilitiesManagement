@@ -59,7 +59,7 @@ const FindAll = async (req) => {
     }
     const startIndex = (page - 1) * size;
     const existedUser = await User.find(query).populate({ path: "roleId", select: userProjecttion }).skip(startIndex).limit(size).exec();
-    let total = await User.countDocuments();
+    let total = await User.countDocuments(query);
 
     return {
         user: existedUser, totalPage: Math.ceil(total / size),

@@ -29,9 +29,15 @@ const FindAll = async (req) => {
     }
 
     const existedUser = await Booking.find(query, userProjecttion)
-        .populate({ path: 'booker', select: userProjecttion })
+        .populate({
+            path: 'booker',
+            select: userProjecttion,
+            populate: { path: 'roleId', select: userProjecttion } // Thêm thông tin về vai trò trực tiếp vào đối tượng booker
+        })
         .populate({ path: 'facilityId', select: userProjecttion })
-        .populate({ path: 'handler', select: userProjecttion }).skip(startIndex).limit(size)
+        .populate({ path: 'handler', select: userProjecttion })
+        .skip(startIndex)
+        .limit(size)
         .exec();
     let arrangeSeven = existedUser;
     if (weeks) {
@@ -48,16 +54,6 @@ const FindAll = async (req) => {
         // console.log(existedUser);
         for (const day of existedUser) {
             let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
-            // let bookingObject = day.toObject();
-            // if (bookingObject.status == 1) {
-            //     bookingObject.status = 'Pending';
-            // } else if (bookingObject.status == 2) {
-            //     bookingObject.status = 'Accept';
-            // } else if (bookingObject.status == 3) {
-            //     bookingObject.status = 'Reject';
-            // } else if (bookingObject.status == 4) {
-            //     bookingObject.status = 'Expire';
-            // }
             if (nameDay === 'Monday') {
                 arrangeSeven.Monday.push(day);
             }
@@ -82,7 +78,9 @@ const FindAll = async (req) => {
 
         }
     }
-    let total = await Booking.countDocuments();
+    let total = await Booking.countDocuments(query);
+
+    console.log(total);
     return {
         booking: arrangeSeven, totalPage: Math.ceil(total / size),
         activePage: page
@@ -107,16 +105,8 @@ const StatusBooking = async (req) => {
     let today = new Date();
     // console.log(id);
     today.setHours(0, 0, 0, 0);
-    let oneWeekFromToday = new Date(today.getTime() + 8 * 24 * 60 * 60 * 1000);
+    let oneWeekFromToday = new Date(today.getTime() + 15 * 24 * 60 * 60 * 1000);
     oneWeekFromToday.setHours(0, 0, 0, 0)
-    // giải pháp
-    // lấy ra 7 ngày kể từ ngày hôm nay bằng điều kiện trong mongoose
-    // tạo mảng rỗng: chứa mảng của monday, tú....
-    // sau đó: lặp từng ngày một
-
-    // nếu ngày hôm đấy là thứ 2 thì tống cổ vào mảng của thứ 2
-    // thứ 3 thì tổng cổ vào thứ 3
-    // (nếu muốn rõ từng slot): thì so sánh nếu thứ đấy, vào trong if (slot 1 hay 2...) thì tống cổ vào đấy là được 
     let arrangeSeven = {
         Monday: [],
         Tuesday: [],
@@ -126,7 +116,7 @@ const StatusBooking = async (req) => {
         Saturday: [],
         Sunday: [],
     }
-    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
+    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
     for (const day of sevenDay) {
         let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
         // let day = day.toObject();
