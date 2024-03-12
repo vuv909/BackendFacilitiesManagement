@@ -25,7 +25,19 @@ const updateNotificationToRead = async (req, res) => {
     }
 }
 
+const updateNotificationUser = async (req, res) => {
+    const userId = req.userID;
+    try {
+        const result = await notificationService.updateNotificationUser(userId);
+        const code = result.statusCode === 1 ? 200 : 500;
+        return res.status(code).json(result);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+}
+
 export default {
     getNotificationByUser,
-    updateNotificationToRead
+    updateNotificationToRead,
+    updateNotificationUser
 }

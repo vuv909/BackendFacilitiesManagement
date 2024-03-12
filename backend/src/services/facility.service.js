@@ -155,7 +155,6 @@ const listPagination = async (page, size, name, categoryId) => {
 
 const listDashboard = async (page, size, name, categoryId, sort) => {
     const startIndex = (page - 1) * size;
-    console.log(startIndex);
     const category = await categoryService.findOne(categoryId);
     const query = { name: { $regex: name, $options: 'i' } };
     if (category.statusCode == 1) {
@@ -212,6 +211,10 @@ const listDashboard = async (page, size, name, categoryId, sort) => {
             message: "System error"
         }
     }
+}
+
+const getListFacilityByTime = async (startDate, startTime) => {
+
 }
 
 export default {

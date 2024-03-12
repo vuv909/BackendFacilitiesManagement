@@ -8,5 +8,6 @@ const notificationRouter = express.Router();
 notificationRouter.get("/",  authJWT.verifyToken, notificationController.getNotificationByUser);
 
 notificationRouter.put("/update-read/:id", authJWT.verifyToken, notificationController.updateNotificationToRead)
+notificationRouter.put("/update-read-all/", authJWT.verifyToken, notificationController.updateNotificationUser)
 
 export default notificationRouter;
