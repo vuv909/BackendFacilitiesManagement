@@ -77,7 +77,7 @@ socketIo.on('connection', (socket) => {
 });
 
 // cron job for run every day at 00:00
-cron.schedule('3 0 * * *', async () => {
+cron.schedule('* * * * *', async () => {
     console.log("Start clean booking expried!!!");
     await bookingService.CheckExpireBooking();
 })
