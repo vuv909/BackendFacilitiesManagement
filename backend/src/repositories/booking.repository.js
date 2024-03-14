@@ -16,7 +16,7 @@ const FindAll = async (req) => {
     }
     // Xử lý thông tin sort
     let sortOptions = {};
-    const { sort, role, status, weeks } = req.query;
+    const { sort, role, status, weeks, name } = req.query;
     if (sort) {
         const sortFields = Array.isArray(sort) ? sort : [sort];
         sortFields.forEach(sortField => {
@@ -24,7 +24,6 @@ const FindAll = async (req) => {
             sortOptions[field] = (order === 'asc' ? 1 : -1);
         });
     }
-    console.log(sortOptions);
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
     const startIndex = (page - 1) * size;
@@ -103,6 +102,18 @@ const FindAll = async (req) => {
         }
         existedUser = filter;
         total = filter.length;
+    }
+    let searchFacility = [];
+    if (name) {
+        // search theo name facility 
+        // so sánh name của facility 
+        for (const book of existedUser) {
+            if (book.facilityId && book.facilityId.name.toLowerCase().includes(name.toLowerCase())) {
+                searchFacility.push(book)
+            }
+        }
+        existedUser = searchFacility;
+        total = searchFacility.length;
     }
 
     let arrangeSeven = existedUser;
