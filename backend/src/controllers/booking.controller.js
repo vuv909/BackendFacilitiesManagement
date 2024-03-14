@@ -94,11 +94,37 @@ const listPagination = async (req, res) => {
         });
     }
 }
+const Dashboard = async (req, res) => {
+
+    try {
+        console.log("hello");
+        const response = await bookingService.Dashboard(req);
+
+        return res.status(200).json(response);
+    } catch (error) {
+        return res.status(500).json({
+            message: error?.message || error,
+        });
+    }
+}
+const DashboardWeek = async (req, res) => {
+
+    try {
+        console.log("hello");
+        const response = await bookingService.DashboardWeek(req);
+
+        return res.status(200).json(response);
+    } catch (error) {
+        return res.status(500).json({
+            message: error?.message || error,
+        });
+    }
+}
 
 export default {
     create,
     update,
     remove,
-    detail,
+    detail, Dashboard, DashboardWeek,
     listPagination, statusBooking, FindBoookinUser
 }

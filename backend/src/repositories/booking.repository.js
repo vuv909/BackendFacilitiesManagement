@@ -314,12 +314,6 @@ const CreateOne = async (req) => {
         startDate2 = STARTDATE_SLOT9;
         endDate2 = ENDDATE_SLOT9;
     }
-    // const today = new Date();
-
-    // // Định dạng ngày hôm nay dưới dạng YYYY-MM-DD
-    // const formattedDate = today.toISOString().split('T')[0];
-
-    // // Ghép chuỗi thời gian với ngày hôm nay
     const startTimeString = startDate + startDate2;
     const endTimeString = endDate + endDate2;
     // console.log(startTimeString);
@@ -345,6 +339,108 @@ const CreateOne = async (req) => {
     await notificationService.sendNotificationToAdmin(notification);
     return existedUser;
 }
+/*
+    Tên hàm: dashboard theo năm, hoặc theo tháng của booking
+        Tham số: Year hoặc month 
+    Created by: Đặng Đình Quốc Khánh
+*/
+const Dashboard = async (req) => {
+    // arrange
+    // check xem năm trước xem có không hoặc check tháng xem có không
+    const { year, status } = req.query;
+    // check năm trước
+    // nếu có năm thì mk sẽ lấy thông tin của booking; với year bằng với year truyền tới
+    const targetYear = year;
+    let books = await Booking.find({ "createdAt": { $gte: new Date(`${targetYear}-01-01`), $lt: new Date(`${targetYear + 1}-01-01`) }, status: status }).exec();
+
+    // sau đó tạo mảng chứa 12 tháng
+    let bookingYear = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    console.log('hello');
+    for (const book of books) {
+        var dateObject = new Date(book?.createdAt);
+
+        // Lấy tháng từ đối tượng Date
+        var month = dateObject.getMonth() + 1; // Tháng trong JavaScript bắt đầu từ 0, nên cần cộng thêm 1
+        switch (month) {
+            case 1:
+                bookingYear[0]++;
+                break;
+            case 2:
+                bookingYear[1]++;
+                break;
+            case 3:
+                bookingYear[2]++;
+                break;
+            case 4:
+                bookingYear[3]++;
+                break;
+            case 5:
+                bookingYear[4]++;
+                break;
+            case 6:
+                bookingYear[5]++;
+                break;
+            case 7:
+                bookingYear[6]++;
+                break;
+            case 8:
+                bookingYear[7]++;
+                break;
+            case 9:
+                bookingYear[8]++;
+                break;
+            case 10:
+                bookingYear[9]++;
+                break;
+            case 11:
+                bookingYear[10]++;
+                break;
+            case 12:
+                bookingYear[11]++;
+                break;
+            default:
+                console.log("Invalid month");
+        }
+    }
+    // gán từng tháng theo status của năm 
+    return bookingYear;
+}
+const DashboardWeek = async (req) => {
+    // arrange
+    // check xem năm trước xem có không hoặc check tháng xem có không
+    const { year, month, status } = req.query;
+    const targetYear = parseInt(year); // Chuyển đổi year thành số nguyên
+    const targetMonth = parseInt(month); // Chuyển đổi month thành số nguyên
+
+    // Tạo ngày bắt đầu của tháng và kết thúc của tháng
+    const startDate = new Date(targetYear, targetMonth - 1, 1); // Ngày bắt đầu của tháng
+    const endDate = new Date(targetYear, targetMonth, 0); // Ngày cuối cùng của tháng
+
+    // Đặt giờ, phút, giây và miligiây để kết thúc ngày là 23:59:59.999
+    endDate.setUTCHours(23, 59, 59, 999);
+
+    // Truy vấn MongoDB
+    let books = await Booking.find({
+        "createdAt": {
+            $gte: startDate, // Bắt đầu từ ngày đầu tiên của tháng
+            $lte: endDate // Kết thúc vào ngày cuối cùng của tháng
+        },
+        status: status
+    }).exec();
+
+    // sau đó tạo mảng chứa 12 tháng
+    let bookingYear = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    console.log('hello');
+    for (const book of books) {
+        var dateObject = new Date(book?.createdAt);
+
+        // Lấy tháng từ đối tượng Date
+
+
+    }
+    // gán từng tháng theo status của năm 
+    return bookingYear;
+}
 
 async function checkBooking(query) {
     try {
@@ -358,7 +454,7 @@ async function checkBooking(query) {
 }
 
 export default {
-    FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking, FindBoookingUser
+    FindAll, FindBooking, UpdateOne, DeleteOne, CreateOne, StatusBooking, FindBoookingUser, Dashboard, DashboardWeek
 }
 
 
