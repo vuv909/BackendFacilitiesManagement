@@ -23,7 +23,6 @@ const login = async (credential) => {
                 throw new Error("Only FPT University people can login to this system");
             }
             const user = await userRepository.checkUserInDB(profile);
-            console.log(user, "user");
             if(user.status === 3){
                 return {
                     statusCode: 0,

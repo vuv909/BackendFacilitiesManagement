@@ -118,7 +118,8 @@ const getCommentsByFacilityId = async (facilityId, page, size) => {
             message: "Get data successfully",
             items: comments.items,
             totalPage: Math.ceil(comments.total/size),
-            activePage: page
+            activePage: page,
+            totalCOmment: comments.total
         }
     }catch(error){
         return {
