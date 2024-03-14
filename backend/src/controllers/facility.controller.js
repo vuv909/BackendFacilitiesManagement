@@ -5,8 +5,7 @@ import fileService from "../services/file.service.js";
 const create = async (req, res) => {
     const data = req.body;
     try{
-        const imageResult = await fileService.uploadFile(data);
-        const result = await facilityService.create(data, imageResult);
+        const result = await facilityService.create(data);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     }catch(error){
@@ -17,8 +16,7 @@ const create = async (req, res) => {
 const update = async (req, res) => {
     const data = req.body;
     try{
-        const imageResult = await fileService.uploadFile(data);
-        const result = await facilityService.update(data, imageResult);
+        const result = await facilityService.update(data);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     }catch(error){
@@ -62,10 +60,37 @@ const listPagination = async (req, res) => {
     }
 }
 
+const listDashboard = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 5;
+    const name = req.query.name || '';
+    const category = req.query.categoryId || '';
+    const sort = req.query.sort || '';
+    try{
+        const result = await facilityService.listDashboard(page, size, name, category, sort);
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    }catch(error){
+        return res.status(500).json(error);
+    }
+}
+
+const getListFacilityByCategory = async(req, res) => {
+    try{
+        const result = await facilityService.getFacilityByCategory();
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    }catch(error){
+        return res.status(500).json(error);
+    }
+}
+
 export default {
     create,
     update,
     remove,
     detail,
-    listPagination
+    listPagination,
+    listDashboard,
+    getListFacilityByCategory
 }

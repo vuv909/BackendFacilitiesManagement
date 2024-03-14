@@ -36,8 +36,6 @@ const update = async (req) => {
 }
 
 const deleteOne = async (req) => {
-
-
     try {
         const result = await bookingRepository.DeleteOne(req);
         if (result == null) {
@@ -165,8 +163,8 @@ const FindBoookinUser = async (req) => {
 const CheckExpireBooking = async () => {
     try {
         const updateResult = await Booking.updateMany(
-            { 'startDate': { $lte: new Date() } },
-            { $set: { 'status': 3 } }
+            { 'startDate': { $lte: new Date() }, "status": 1 },
+            { $set: { 'status': 4, reason: "Quá hạn" } },
         );
         return updateResult;
     } catch (err) {
@@ -175,5 +173,7 @@ const CheckExpireBooking = async () => {
 }
 export default {
     create, Dashboard, DashboardWeek,
-    update, FindAll, deleteOne, detail, statusBooking, FindBoookinUser
+    update, FindAll, deleteOne, detail, statusBooking, FindBoookinUser,
+
+    CheckExpireBooking
 }

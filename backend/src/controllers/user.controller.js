@@ -5,9 +5,9 @@ const login = async (req, res) => {
     const credentital = req.body.credential;
     try {
         const response = await userService.login(credentital);
-        return res.status(200).json(response);
+        const statusCode = response.statusCode == 1 ? 200 : 400;
+        return res.status(statusCode).json(response);
     } catch (error) {
-        console.log("error", error.toString());
         return res.status(500).json({
             error: error?.message || error.toString(),
         });
@@ -43,7 +43,6 @@ const FindAll = async (req, res) => {
 
     try {
         const response = await userService.FindAll(req);
-
         return res.status(200).json(response);
     } catch (error) {
         return res.status(500).json({
@@ -52,6 +51,16 @@ const FindAll = async (req, res) => {
     }
 }
 
+const getListUserByRole = async (req, res) => {
+    try{
+        const result = await userService.getListUserByRole();
+        const statusCode = result.statusCode == 1 ? 200 : 500;
+        return res.status(statusCode).json(result);
+    }catch(error){
+        return res.status(500).json(error);
+    }
+}
+
 export default {
-    login, FindOne, UpdateOne, FindAll
+    login, FindOne, UpdateOne, FindAll, getListUserByRole
 }

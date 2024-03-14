@@ -1,22 +1,26 @@
 import Category from "../models/Category.js"
 import categoryRepository from "../repositories/category.repository.js";
+import deepCopy from "../utils/index.js";
+import fileService from "./file.service.js";
+import logService from "./log.service.js";
 
-const create = async (data, imageResult) => {
+const create = async (data) => {
     try {
         const category = data;
+        const exsitedCategory = await Category.find({ categoryName: category.categoryName });
+        if (exsitedCategory && exsitedCategory.length > 0) {
+            return {
+                statusCode: 0,
+                message: "Category type is already exsited"
+            }
+        }
+        const imageResult = await fileService.uploadFile(data);
         if (imageResult.statusCode == 1 && imageResult.urls) {
             category.image = imageResult.urls[0];
         }else {
             return {
                 statusCode: 0,
                 message: "Error when upload image"
-            }
-        }
-        const exsitedCategory = await Category.find({ categoryName: category.categoryName });
-        if (exsitedCategory && exsitedCategory.length > 0) {
-            return {
-                statusCode: 0,
-                message: "Category type is already exsited"
             }
         }
         const newCategory = await Category.create(category);
@@ -55,21 +59,27 @@ const list = async (page, size, name) => {
     }
 }
 
-const update = async (data, imageResult) => {
+const update = async (data) => {
     try {
         const category = data;
-        if (imageResult.statusCode == 1 && imageResult.urls) {
-            category.image = imageResult.urls[0];
-        }else {
+        const categoryUpdate = await categoryRepository.findOne({_id: category.id});
+        const objectBefore = deepCopy(categoryUpdate);
+        const categoryExisted = await categoryRepository.findOne({categoryName: category.categoryName});
+        if(categoryExisted && !categoryExisted._id.equals(categoryUpdate._id)){
             return {
                 statusCode: 0,
-                message: "Error when upload image"
+                message: "Category name is exsited"
             }
         }
-        const categoryUpdate = await categoryRepository.findOne({_id: category.id});
+        const imageResult = await fileService.uploadFile(data);
+        if (imageResult.statusCode == 1 && imageResult.urls) {
+            category.image = imageResult.urls[0];
+        }
         categoryUpdate.categoryName = category.categoryName;
-        categoryUpdate.image = category.image;
+        categoryUpdate.image = category.image ? category.image : categoryUpdate.image;
         await categoryUpdate.save();
+        const objectAfter = deepCopy(categoryUpdate);
+        await logService.create({collectionName: "Category", objectBefore, objectAfter, action: "update", id: categoryUpdate._id})
         return {
             message: "Update successfully",
             statusCode: 1,

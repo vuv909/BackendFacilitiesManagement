@@ -15,7 +15,6 @@ const checkUserInDB = async (user) => {
         });
         return newUser.populate({ path: 'roleId', select: "roleName" });
     } else {
-        existedUser.roleId = role._id;
         await existedUser.save();
     }
     return existedUser.populate({ path: 'roleId', select: "roleName" });
@@ -68,6 +67,11 @@ const FindAll = async (req) => {
     };
 }
 
+const findCondition = async (object) => {
+    const listUser = await User.find(object);
+    return listUser
+}
+
 export default {
-    checkUserInDB, findUser, UpdateOne, FindAll
+    checkUserInDB, findUser, UpdateOne, FindAll, findCondition
 }

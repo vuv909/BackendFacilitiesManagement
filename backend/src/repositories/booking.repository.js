@@ -2,8 +2,10 @@ import mongoose from 'mongoose';
 import Booking from '../models/Booking.js'
 import { Types } from 'mongoose';
 import { ENDDATE_SLOT1, ENDDATE_SLOT2, ENDDATE_SLOT3, ENDDATE_SLOT4, ENDDATE_SLOT5, ENDDATE_SLOT6, ENDDATE_SLOT7, ENDDATE_SLOT8, ENDDATE_SLOT9, STARTDATE_SLOT1, STARTDATE_SLOT2, STARTDATE_SLOT3, STARTDATE_SLOT4, STARTDATE_SLOT5, STARTDATE_SLOT6, STARTDATE_SLOT7, STARTDATE_SLOT8, STARTDATE_SLOT9 } from '../Enum/DateTimeSlot.js';
-
-
+import User from '../models/User.js';
+import Facility from '../models/Facility.js';
+import { notificationService } from '../services/index.js';
+import Notification from '../models/Notification.js';
 
 const FindAll = async (req) => {
 
@@ -239,8 +241,16 @@ const UpdateOne = async (req) => {
         return null;
     }
     const { id } = req.params;
-
     const existedUser = await Booking.findByIdAndUpdate(id, req.body, { new: true }).exec();
+    const message = req.body.status === 2 ? "Yêu cầu của bạn đã được phê duyệt" : "Yêu cầu của bạn đã bị từ chối";
+    const user = await User.findById(existedUser.booker);
+    const notification = {
+        userId: existedUser.booker,
+        content: message,
+        path: '/historyBooking',
+        name: user.name
+    }
+    await notificationService.createNotification(notification);
     return existedUser;
 }
 const DeleteOne = async (req) => {
@@ -316,7 +326,17 @@ const CreateOne = async (req) => {
         startDate: start,
         endDate: end
     }
+
     const existedUser = await Booking.create({ ...req.body, ...dateSlot });
+    const user = await User.findById(booker);
+    const facility = await Facility.findById(facilityId);
+    const notification = {
+        content: `${user.name} đã đặt phòng: ${facility.name}`,
+        path: '/dashboard',
+        name: user.name
+    }
+    console.log("Notification: ", notification);
+    await notificationService.sendNotificationToAdmin(notification);
     return existedUser;
 }
 /*

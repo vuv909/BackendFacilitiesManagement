@@ -7,6 +7,9 @@ const userRouter = express.Router();
 userRouter.post("/login", userController.login);
 // view list user
 
+// Get statstic user by role
+userRouter.get("/stastic-by-role", authJWT.verifyToken, userController.getListUserByRole);
+
 userRouter.get("/", userController.FindAll);
 // view user profile
 // created by: quốc khánh 
@@ -14,4 +17,6 @@ userRouter.get("/:id", userController.FindOne);
 
 // Update User profile 
 userRouter.put("/:id", userController.UpdateOne);
+
+
 export default userRouter;

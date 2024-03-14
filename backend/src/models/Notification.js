@@ -8,18 +8,19 @@ const Notification = mongoose.model("Notification", new Schema(
             ref: 'User' 
         },
         content: {
-            type: Number,
+            type: String,
             required: true
         },
         path: {
             type: String,
         },
-        modifiedBy: {
+        name: {
             type: String,
         },
-        createdBy: {
-            type: String,
-            require: true
+        read: {
+            type: Boolean,
+            require: true,
+            default: false
         }
     },
     {

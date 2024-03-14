@@ -1,23 +1,21 @@
-import { validationResult } from "express-validator";
-import { categoryService } from "../services/index.js";
+import { chatService } from "../services/index.js";
 
 const create = async (req, res) => {
     const data = req.body;
     try {
-        const result = await categoryService.create(data);
-        const statusCode = result.statusCode == 1 ? 201 : 500;
+        const result = await chatService.create(data);
+        const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     } catch (error) {
         return res.status(500).json(error)
     }
-} 
+}
 
 const list = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
-    const name = req.query.name || '';
     try {
-        const result = await categoryService.list(page, size, name);
+        const result = await chatService.listUser(page, size);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     } catch (error) {
@@ -25,10 +23,10 @@ const list = async (req, res) => {
     }
 }
 
-const update = async (req, res) => {
-    const data = req.body;
+const listUserMessage = async (req, res) => {
+    const userId = req.userID;
     try {
-        const result = await categoryService.update(data);
+        const result = await chatService.listMessage(userId);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     } catch (error) {
@@ -36,20 +34,19 @@ const update = async (req, res) => {
     }
 }
 
-const remove = async (req, res) => {
-    const {id} = req.query;
+const listAdminMessage = async (req, res) => {
+    const { userId } = req.query;
     try {
-        const result = await categoryService.remove(id);
+        const result = await chatService.listMessage(userId);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     } catch (error) {
         return res.status(500).json(error);
     }
 }
-
 export default {
     create,
     list,
-    update,
-    remove
+    listUserMessage,
+    listAdminMessage
 }
