@@ -119,7 +119,7 @@ const getCommentsByFacilityId = async (facilityId, page, size) => {
             items: comments.items,
             totalPage: Math.ceil(comments.total/size),
             activePage: page,
-            totalCOmment: comments.total
+            totalComment: comments.total
         }
     }catch(error){
         return {
