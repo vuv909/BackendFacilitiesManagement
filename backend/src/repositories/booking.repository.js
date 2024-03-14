@@ -48,10 +48,8 @@ const FindAll = async (req) => {
         })
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion })
-        .skip(startIndex)
-        .limit(size)
-        .sort(sortOptions)
         .exec();
+
     if (weeks) {
         arrangeSeven = {
             Monday: [],
@@ -92,29 +90,26 @@ const FindAll = async (req) => {
     }
     let total = await Booking.countDocuments(query);
 
-    let filter = [];
+    // let total = existedUser.length; // Đếm tổng số dữ liệu trước khi lọc
+
+    // Lọc theo role nếu được chỉ định
     if (role) {
         const roleId = new mongoose.Types.ObjectId(role);
-        for (const book of existedUser) {
-            if (book.booker && book.booker.roleId['_id'].equals(roleId)) {
-                filter.push(book)
-            }
-        }
-        existedUser = filter;
-        total = filter.length;
+        existedUser = existedUser.filter(book => book.booker && book.booker.roleId['_id'].equals(roleId));
     }
-    let searchFacility = [];
+
+    // Lọc theo tên facility nếu được chỉ định
     if (name) {
-        // search theo name facility 
-        // so sánh name của facility 
-        for (const book of existedUser) {
-            if (book.facilityId && book.facilityId.name.toLowerCase().includes(name.toLowerCase())) {
-                searchFacility.push(book)
-            }
-        }
-        existedUser = searchFacility;
-        total = searchFacility.length;
+        const searchName = name.toLowerCase();
+        existedUser = existedUser.filter(book => book.facilityId && book.facilityId.name.toLowerCase().includes(searchName));
     }
+
+    // Tính tổng số lượng dữ liệu sau khi lọc
+    total = existedUser.length;
+
+    // Áp dụng phân trang
+    existedUser = existedUser.slice(startIndex, startIndex + size);
+
 
     let arrangeSeven = existedUser;
     return {
@@ -203,7 +198,7 @@ const FindBoookingUser = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    const { id } = req.params;
+    const { id, name } = req.params;
 
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
@@ -213,22 +208,19 @@ const FindBoookingUser = async (req) => {
     const { ObjectId } = Types;
     const existedUser = await Booking.find({
     }, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
+
     let arrUser = [];
     for (const item of existedUser) {
         if (item.booker?._id.equals(new ObjectId(id))) {
             arrUser.push(item)
         }
     }
+    if (name) {
+        const searchName = name.toLowerCase();
+        arrUser = arrUser.filter(e => e?.facilityId && e?.facilityId.name.toLowerCase().includes(searchName));
+    }
     // Phân trang
     const paginatedArrUser = arrUser.slice(startIndex, startIndex + size);
-
-    // Tạo object chứa thông tin phân trang
-    const paginationInfo = {
-        currentPage: page,
-        totalPages: Math.ceil(arrUser.length / size),
-        totalItems: arrUser.length,
-        pageSize: size
-    };
     let total = arrUser.length;
     return {
         booking: paginatedArrUser, totalPage: Math.ceil(total / size),
