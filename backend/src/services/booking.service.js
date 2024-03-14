@@ -139,7 +139,7 @@ const FindBoookinUser = async (req) => {
 const CheckExpireBooking = async () => {
     try {
         const updateResult = await Booking.updateMany(
-            { 'startDate': { $lte: new Date() } },
+            { 'startDate': { $lte: new Date() }, "status": 1 },
             { $set: { 'status': 4, reason: "Quá hạn" } },
         );
         return updateResult;
