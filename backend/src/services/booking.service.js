@@ -96,6 +96,30 @@ const create = async (req) => {
         }
     }
 }
+const Dashboard = async (req) => {
+
+    try {
+        let user = await bookingRepository.Dashboard(req);
+        return user;
+    } catch (error) {
+        return {
+            message: "Error",
+            content: error.toString()
+        }
+    }
+}
+const DashboardWeek = async (req) => {
+
+    try {
+        let user = await bookingRepository.DashboardWeek(req);
+        return user;
+    } catch (error) {
+        return {
+            message: "Error",
+            content: error.toString()
+        }
+    }
+}
 const FindAll = async (req) => {
 
     try {
@@ -150,6 +174,6 @@ const CheckExpireBooking = async () => {
     }
 }
 export default {
-    create,
+    create, Dashboard, DashboardWeek,
     update, FindAll, deleteOne, detail, statusBooking, FindBoookinUser
 }

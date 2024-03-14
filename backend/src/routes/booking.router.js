@@ -5,6 +5,8 @@ const bookingRouter = express.Router();
 
 bookingRouter.get("/", bookingController.listPagination);
 bookingRouter.post("/", bookingController.create);
+bookingRouter.get("/dashboard/month", bookingController.Dashboard);
+bookingRouter.get("/dashboard/week", bookingController.DashboardWeek);
 
 bookingRouter.get("/status/:id", bookingController.statusBooking);
 bookingRouter.get("/:id", bookingController.detail);
