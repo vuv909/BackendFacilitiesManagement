@@ -198,7 +198,8 @@ const FindBoookingUser = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    const { id, name } = req.params;
+    const { id } = req.params;
+    const { name } = req.query;
 
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
