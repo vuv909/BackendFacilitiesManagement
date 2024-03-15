@@ -21,7 +21,7 @@ const checkUserInDB = async (user) => {
 }
 const findUser = async (id) => {
     try {
-        const userProjecttion = {
+        const userProjecttion = { 
             createdAt: 0,
             updatedAt: 0,
             id: 0

@@ -9,12 +9,12 @@ const create = async ({ collectionName, objectBefore, objectAfter, action, id })
         id
     })
     return newLog;
-}
+} 
 
 const list = async (page, size, type, id) => {
     try {
         const startIndex = (page - 1) * size;
-        const listLog = await Log.find({ collectionName: type, id }).skip(startIndex).limit(size);
+        const listLog = await Log.find({ collectionName: type, id }).sort({createdAt: -1}).skip(startIndex).limit(size);
         const totalRecors = await Log.countDocuments({ collectionName: type, id });
         return {
             statusCode: 1,
