@@ -48,6 +48,7 @@ const FindAll = async (req) => {
         })
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion })
+        .sort(sortOptions)
         .exec();
 
     if (weeks) {
