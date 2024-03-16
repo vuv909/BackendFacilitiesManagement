@@ -48,6 +48,7 @@ const FindAll = async (req) => {
         })
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion })
+        .sort(sortOptions)
         .exec();
 
     if (weeks) {
@@ -198,7 +199,8 @@ const FindBoookingUser = async (req) => {
         updatedAt: 0,
         id: 0
     }
-    const { id, name } = req.params;
+    const { id } = req.params;
+    const { name } = req.query;
 
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
