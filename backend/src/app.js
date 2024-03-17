@@ -104,19 +104,19 @@ cron.schedule('* * * * *', async () => {
 
 })
 // Cấu hình cron job để chạy vào mỗi ngày lúc 09:00:00 và các thời điểm khác theo yêu cầu
-cron.schedule('20 7 * * *', async () => {
+cron.schedule('30 7 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot1');
 });
-cron.schedule('40 10 * * *', async () => {
+cron.schedule('50 10 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot2');
 });
-cron.schedule('40 12 * * *', async () => {
+cron.schedule('50 12 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot3');
 });
-cron.schedule('20 15 * * *', async () => {
+cron.schedule('30 15 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot4');
 });
-cron.schedule('30 17 * * *', async () => {
+cron.schedule('40 17 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot5');
 });
 // handling catch error
