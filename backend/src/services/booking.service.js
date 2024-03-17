@@ -171,9 +171,27 @@ const CheckExpireBooking = async () => {
         console.error(err);
     }
 }
+
+const CheckUnusedBooking = async (slot) => {
+    try {
+        const updateResult = await Booking.updateMany(
+            {
+                'startDate': { $lte: new Date() },
+                'endDate': { $gte: new Date() },
+                'status': 2, // Phần này cần nằm trong object của điều kiện tìm kiếm
+                'slot': slot // Phần này cần nằm trong object của điều kiện tìm kiếm
+            },
+            { $set: { 'status': 2 } }
+        );
+
+        return updateResult;
+    } catch (err) {
+        console.error(err);
+    }
+}
 export default {
     create, Dashboard, DashboardWeek,
     update, FindAll, deleteOne, detail, statusBooking, FindBoookinUser,
 
-    CheckExpireBooking
+    CheckExpireBooking, CheckUnusedBooking
 }
