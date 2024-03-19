@@ -18,6 +18,10 @@ const Log = mongoose.model("Log", new Schema(
         },
         id: {
             type: String
+        },
+        actionUser: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
         }
 	},
 	{

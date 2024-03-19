@@ -27,8 +27,9 @@ const list = async (req, res) => {
 
 const update = async (req, res) => {
     const data = req.body;
+    const userId = req.userID;
     try {
-        const result = await categoryService.update(data);
+        const result = await categoryService.update(data, userId);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     } catch (error) {

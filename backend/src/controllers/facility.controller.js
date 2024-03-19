@@ -15,8 +15,9 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     const data = req.body;
+    const actionUser = req.userID;
     try{
-        const result = await facilityService.update(data);
+        const result = await facilityService.update(data, actionUser);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     }catch(error){

@@ -39,7 +39,7 @@ const create = async (data) => {
         }
     }
 }
-const update = async (data) => {
+const update = async (data, actionUser) => {
     const facility = data;
     try {
         const existedFacility = await Facility.findById(facility?.id);
@@ -69,7 +69,7 @@ const update = async (data) => {
         existedFacility.image = facility.image ? facility.image : existedFacility.image;
         await existedFacility.save();
         const objectAfter = deepCopy(existedFacility);
-        await logService.create({ collectionName: "Facility", objectBefore, objectAfter, action: "update", id: existedFacility._id })
+        await logService.create({ collectionName: "Facility", objectBefore, objectAfter, action: "update", id: existedFacility._id, actionUser })
         return {
             statusCode: 1,
             message: "Updated successfully",
@@ -222,7 +222,7 @@ const getFacilityByCategory = async () => {
             return { [category.categoryName]: countFacility };
         });
         const resultArray = await Promise.all(promises);
-        const newObject = Object.assign({}, ...resultArray);        
+        const newObject = Object.assign({}, ...resultArray);
         return {
             statusCode: 1,
             data: newObject
