@@ -107,16 +107,15 @@ const FindAll = async (req) => {
         const { ObjectId } = Types;
         total = existedUser.length;
         existedUser.sort((a, b) => {
-            // Convert classId to strings for comparison (assuming they are ObjectIds)
-            const classIdA = a.facilityId.toString();
-            const classIdB = b.facilityId.toString();
+            const classIdA = a?.facilityId?.toString();
+            const classIdB = b?.facilityId?.toString();
 
             // Sort by classId first
             if (classIdA !== classIdB) {
-                return classIdA.localeCompare(classIdB);
+                return classIdA?.localeCompare(classIdB);
             } else {
                 // If classIds are the same, sort by slot
-                return a.slot.localeCompare(b.slot);
+                return a?.slot?.localeCompare(b.slot);
             }
         });
 
@@ -159,7 +158,10 @@ const StatusBooking = async (req) => {
         Saturday: [],
         Sunday: [],
     }
-    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
+    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] }, userProjecttion)
+        .populate({ path: 'booker', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } })
+        .populate({ path: 'facilityId', select: userProjecttion })
+        .populate({ path: 'handler', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } }).exec();
     for (const day of sevenDay) {
         let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
         // let day = day.toObject();
