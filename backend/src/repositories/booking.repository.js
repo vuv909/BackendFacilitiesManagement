@@ -421,7 +421,11 @@ const Dashboard = async (req) => {
     // check năm trước
     // nếu có năm thì mk sẽ lấy thông tin của booking; với year bằng với year truyền tới
     const targetYear = year;
-    let books = await Booking.find({ "createdAt": { $gte: new Date(`${targetYear}-01-01`), $lt: new Date(`${targetYear + 1}-01-01`) }, status: status }).exec();
+    let query = { "createdAt": { $gte: new Date(`${targetYear}-01-01`), $lt: new Date(`${targetYear + 1}-01-01`) } };
+    if (status) {
+        query = { ...query, status: status };
+    }
+    let books = await Booking.find(query).exec();
 
     // sau đó tạo mảng chứa 12 tháng
     let bookingYear = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
