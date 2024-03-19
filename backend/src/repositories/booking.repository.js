@@ -212,6 +212,7 @@ const FindBoookingUser = async (req) => {
         updatedAt: 0,
         id: 0
     }
+    const { ObjectId } = Types;
     const { id } = req.params;
     const { name, weeks } = req.query;
     let query = {};
@@ -223,7 +224,7 @@ const FindBoookingUser = async (req) => {
     // const { weeks } = req.query
     const startIndex = (page - 1) * size;
     // const query = { weeks: { $regex: weeks, $options: 'i' } };
-    // const { ObjectId } = Types;
+
     const existedUser = await Booking.find(query, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
 
     let arrUser = [];
@@ -232,7 +233,6 @@ const FindBoookingUser = async (req) => {
             arrUser.push(item)
         }
     }
-
     if (name) {
         const searchName = name.toLowerCase();
         arrUser = arrUser.filter(e => e?.facilityId && e?.facilityId.name.toLowerCase().includes(searchName));
