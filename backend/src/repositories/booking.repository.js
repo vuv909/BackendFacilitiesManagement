@@ -6,7 +6,7 @@ import User from '../models/User.js';
 import Facility from '../models/Facility.js';
 import { notificationService } from '../services/index.js';
 import Notification from '../models/Notification.js';
-
+import { ObjectId } from 'mongoose';
 const FindAll = async (req) => {
 
     const userProjecttion = {
@@ -48,8 +48,22 @@ const FindAll = async (req) => {
         })
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion })
+        .sort(sortOptions)
         .exec();
+    let arrangeSeven = [];
 
+    let total = await Booking.countDocuments(query);
+    // Lọc theo role nếu được chỉ định
+    if (role) {
+        const roleId = new mongoose.Types.ObjectId(role);
+        existedUser = existedUser.filter(book => book.booker && book.booker.roleId['_id'].equals(roleId));
+    }
+
+    // Lọc theo tên facility nếu được chỉ định
+    if (name) {
+        const searchName = name.toLowerCase();
+        existedUser = existedUser.filter(book => book.facilityId && book.facilityId.name.toLowerCase().includes(searchName));
+    }
     if (weeks) {
         arrangeSeven = {
             Monday: [],
@@ -85,35 +99,32 @@ const FindAll = async (req) => {
             else if (nameDay === 'Sunday') {
                 arrangeSeven.Sunday.push(day);
             }
-
         }
+        existedUser = arrangeSeven;
     }
-    let total = await Booking.countDocuments(query);
+    if (!weeks) {
+        // Tính tổng số lượng dữ liệu sau khi lọc
+        const { ObjectId } = Types;
+        total = existedUser.length;
+        existedUser.sort((a, b) => {
+            const classIdA = a?.facilityId?.toString();
+            const classIdB = b?.facilityId?.toString();
 
-    // let total = existedUser.length; // Đếm tổng số dữ liệu trước khi lọc
+            // Sort by classId first
+            if (classIdA !== classIdB) {
+                return classIdA?.localeCompare(classIdB);
+            } else {
+                // If classIds are the same, sort by slot
+                return a?.slot?.localeCompare(b.slot);
+            }
+        });
 
-    // Lọc theo role nếu được chỉ định
-    if (role) {
-        const roleId = new mongoose.Types.ObjectId(role);
-        existedUser = existedUser.filter(book => book.booker && book.booker.roleId['_id'].equals(roleId));
+        // Áp dụng phân trang
+        existedUser = existedUser.slice(startIndex, startIndex + size);
     }
 
-    // Lọc theo tên facility nếu được chỉ định
-    if (name) {
-        const searchName = name.toLowerCase();
-        existedUser = existedUser.filter(book => book.facilityId && book.facilityId.name.toLowerCase().includes(searchName));
-    }
-
-    // Tính tổng số lượng dữ liệu sau khi lọc
-    total = existedUser.length;
-
-    // Áp dụng phân trang
-    existedUser = existedUser.slice(startIndex, startIndex + size);
-
-
-    let arrangeSeven = existedUser;
     return {
-        booking: arrangeSeven, totalPage: Math.ceil(total / size),
+        booking: existedUser, totalPage: Math.ceil(total / size),
         activePage: page
     };
 
@@ -147,7 +158,10 @@ const StatusBooking = async (req) => {
         Saturday: [],
         Sunday: [],
     }
-    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] }, userProjecttion).populate({ path: 'booker', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
+    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] }, userProjecttion)
+        .populate({ path: 'booker', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } })
+        .populate({ path: 'facilityId', select: userProjecttion })
+        .populate({ path: 'handler', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } }).exec();
     for (const day of sevenDay) {
         let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
         // let day = day.toObject();
@@ -199,16 +213,18 @@ const FindBoookingUser = async (req) => {
         id: 0
     }
     const { id } = req.params;
-    const { name } = req.query;
-
+    const { name, weeks } = req.query;
+    let query = {};
+    if (weeks) {
+        query = { weeks: { $regex: weeks, $options: 'i' }, status: { $in: [1, 2, 3] } }
+    }
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
     // const { weeks } = req.query
     const startIndex = (page - 1) * size;
     // const query = { weeks: { $regex: weeks, $options: 'i' } };
-    const { ObjectId } = Types;
-    const existedUser = await Booking.find({
-    }, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
+    // const { ObjectId } = Types;
+    const existedUser = await Booking.find(query, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
 
     let arrUser = [];
     for (const item of existedUser) {
@@ -216,17 +232,65 @@ const FindBoookingUser = async (req) => {
             arrUser.push(item)
         }
     }
+
     if (name) {
         const searchName = name.toLowerCase();
         arrUser = arrUser.filter(e => e?.facilityId && e?.facilityId.name.toLowerCase().includes(searchName));
     }
-    // Phân trang
-    const paginatedArrUser = arrUser.slice(startIndex, startIndex + size);
+    let arrangeSeven = [];
+    if (weeks) {
+        arrangeSeven = {
+            Monday: [],
+            Tuesday: [],
+            Wednesday: [],
+            Thursday: [],
+            Friday: [],
+            Saturday: [],
+            Sunday: [],
+        }
+        // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
+        // console.log(existedUser);
+        for (const day of arrUser) {
+            let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
+            if (nameDay === 'Monday') {
+                arrangeSeven.Monday.push(day);
+            }
+            else if (nameDay === 'Tuesday') {
+                arrangeSeven.Tuesday.push(day);
+            }
+            else if (nameDay === 'Wednesday') {
+                arrangeSeven.Wednesday.push(day);
+            }
+            else if (nameDay === 'Thursday') {
+                arrangeSeven.Thursday.push(day);
+            }
+            else if (nameDay === 'Friday') {
+                arrangeSeven.Friday.push(day);
+            }
+            else if (nameDay === 'Saturday') {
+                arrangeSeven.Saturday.push(day);
+            }
+            else if (nameDay === 'Sunday') {
+                arrangeSeven.Sunday.push(day);
+            }
+        }
+        arrUser = arrangeSeven;
+    }
+    if (!weeks) {
+        // Phân trang
+        arrUser = arrUser.slice(startIndex, startIndex + size);
+    }
     let total = arrUser.length;
     return {
-        booking: paginatedArrUser, totalPage: Math.ceil(total / size),
+        booking: arrUser, totalPage: Math.ceil(total / size),
         activePage: page
     };
+}
+const checkUnused = (startDateBooking) => {
+    startDateBooking = new Date(startDateBooking);
+    const currentTime = new Date();
+    const isStartDateLater = startDateBooking > currentTime;
+    return isStartDateLater;
 }
 const UpdateOne = async (req) => {
     let booking = await FindBooking(req);
@@ -234,6 +298,17 @@ const UpdateOne = async (req) => {
         return null;
     }
     const { id } = req.params;
+
+
+    if (req.body.status === 2) {
+        const { startDate } = req.body;
+
+        // kiểm tra cái ô này trước
+        req.body.status = checkUnused(startDate) ? 5 : 2;
+
+        const { facilityId, slot } = req.body
+        await Booking.updateMany({ facilityId: facilityId, slot: slot, _id: { $ne: id } }, { $set: { status: 3 } });
+    }
     const existedUser = await Booking.findByIdAndUpdate(id, req.body, { new: true }).exec();
     const message = req.body.status === 2 ? "Yêu cầu của bạn đã được phê duyệt" : "Yêu cầu của bạn đã bị từ chối";
     const user = await User.findById(existedUser.booker);
@@ -243,6 +318,7 @@ const UpdateOne = async (req) => {
         path: '/historyBooking',
         name: user.name
     }
+
     await notificationService.createNotification(notification);
     return existedUser;
 }
@@ -257,6 +333,7 @@ const DeleteOne = async (req) => {
 }
 const CreateOne = async (req) => {
     const { booker, facilityId, weeks, weekdays, slot, status, startDate, endDate } = req.body;
+
     const checkSameBooking = await checkBooking({
         booker: booker,
         facilityId: facilityId,
