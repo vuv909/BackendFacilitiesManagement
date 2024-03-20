@@ -298,10 +298,12 @@ const UpdateOne = async (req) => {
         return null;
     }
     const { id } = req.params;
-
+    const userId = req.userID;
+    req.body.handler = userId;
 
     if (req.body.status === 2) {
         const { startDate } = req.body;
+
 
         // kiểm tra cái ô này trước
         req.body.status = checkUnused(startDate) ? 5 : 2;
