@@ -50,10 +50,10 @@ const update = async (data, actionUser) => {
                 message: "Facility not existed"
             }
         }
-        if(existedFacility.status == 0){
+        if (existedFacility.status == 0) {
             return {
                 statusCode: 0,
-                message: "Facility is deleted" 
+                message: "Facility is deleted"
             }
         }
         const existedName = await Facility.findOne({ name: facility.name });
@@ -99,9 +99,11 @@ const changeStatus = async (id) => {
                 message: "Not found record"
             }
         }
-        facilityDelete.status = 0;
+        facilityDelete.status = facilityDelete.status == 1 ? 0 : 1;
         await facilityDelete.save();
-        const result = await bookingService.updateBookingWhenFacilityDelete(id);
+        if (facilityDelete.status == 0) {
+            await bookingService.updateBookingWhenFacilityDelete(id);
+        }
         console.log(result);
         return {
             statusCode: 1,
@@ -125,7 +127,7 @@ const detail = async (id) => {
                 message: "Not found record"
             }
         }
-        if(facility.status == 0){
+        if (facility.status == 0) {
             return {
                 statusCode: 0,
                 message: "Facility is deleted"
@@ -148,7 +150,7 @@ const listPagination = async (page, size, name, categoryId, status) => {
     const startIndex = (page - 1) * size;
     const category = await categoryService.findOne(categoryId);
     const query = { name: { $regex: name, $options: 'i' } };
-    if(status != null && status != undefined && status != ""){
+    if (status != null && status != undefined && status != "") {
         query.status = status;
     }
     if (category.statusCode == 1) {
@@ -200,7 +202,7 @@ const listPaginationActive = async (page, size, name, categoryId) => {
 const listDashboard = async (page, size, name, categoryId, sort) => {
     const startIndex = (page - 1) * size;
     const category = await categoryService.findOne(categoryId);
-    const query = { name: { $regex: name, $options: 'i' }, status: 1};
+    const query = { name: { $regex: name, $options: 'i' }, status: 1 };
     if (category.statusCode == 1) {
         query.category = categoryId;
     }
