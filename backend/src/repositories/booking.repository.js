@@ -298,11 +298,14 @@ const UpdateOne = async (req) => {
         return null;
     }
     const { id } = req.params;
+    const userId = req.userID;
+    req.body.handler = userId;
 
-    // nếu được accept 
     if (req.body.status === 2) {
         const { startDate } = req.body;
-        // thay đổi trạng thái theo startDate
+
+
+        // kiểm tra cái ô này trước
         req.body.status = checkUnused(startDate) ? 5 : 2;
         // cập nhật những booking khác là 3 
         const { facilityId, slot } = req.body

@@ -17,7 +17,7 @@ const create = async (data) => {
         const imageResult = await fileService.uploadFile(data);
         if (imageResult.statusCode == 1 && imageResult.urls) {
             category.image = imageResult.urls[0];
-        }else {
+        } else {
             return {
                 statusCode: 0,
                 message: "Error when upload image"
@@ -40,18 +40,18 @@ const create = async (data) => {
 const list = async (page, size, name) => {
     const startIndex = (page - 1) * size;
     const query = {
-		categoryName: { $regex: name, $options: 'i' }
-	};
-    try{
-       const listCategory = await categoryRepository.findPagination(startIndex, size, query);
-       return {
+        categoryName: { $regex: name, $options: 'i' }
+    };
+    try {
+        const listCategory = await categoryRepository.findPagination(startIndex, size, query);
+        return {
             statusCode: 1,
             message: "Success",
             item: listCategory.items,
-            totalPage: Math.ceil(listCategory.total/size),
+            totalPage: Math.ceil(listCategory.total / size),
             activePage: page
-       };
-    }catch(error){
+        };
+    } catch (error) {
         return {
             statusCode: 0,
             message: "System error!"
@@ -59,13 +59,13 @@ const list = async (page, size, name) => {
     }
 }
 
-const update = async (data) => {
+const update = async (data, actionUser) => {
     try {
         const category = data;
-        const categoryUpdate = await categoryRepository.findOne({_id: category.id});
+        const categoryUpdate = await categoryRepository.findOne({ _id: category.id });
         const objectBefore = deepCopy(categoryUpdate);
-        const categoryExisted = await categoryRepository.findOne({categoryName: category.categoryName});
-        if(categoryExisted && !categoryExisted._id.equals(categoryUpdate._id)){
+        const categoryExisted = await categoryRepository.findOne({ categoryName: category.categoryName });
+        if (categoryExisted && !categoryExisted._id.equals(categoryUpdate._id)) {
             return {
                 statusCode: 0,
                 message: "Category name is exsited"
@@ -79,13 +79,13 @@ const update = async (data) => {
         categoryUpdate.image = category.image ? category.image : categoryUpdate.image;
         await categoryUpdate.save();
         const objectAfter = deepCopy(categoryUpdate);
-        await logService.create({collectionName: "Category", objectBefore, objectAfter, action: "update", id: categoryUpdate._id})
+        await logService.create({ collectionName: "Category", objectBefore, objectAfter, action: "update", id: categoryUpdate._id, actionUser })
         return {
             message: "Update successfully",
             statusCode: 1,
             data: categoryUpdate
         }
-    }catch(error){
+    } catch (error) {
         return {
             statusCode: 0,
             message: "System error!"
@@ -94,14 +94,14 @@ const update = async (data) => {
 }
 
 const remove = async (id) => {
-    try{
+    try {
         const deleteCategory = await categoryRepository.findAndDelete(id);
         return {
             message: "Remove successfully",
             statusCode: 1,
             content: deleteCategory
         }
-    }catch(error) {
+    } catch (error) {
         return {
             statusCode: 0,
             message: "System error!"
@@ -110,14 +110,14 @@ const remove = async (id) => {
 }
 
 const findOne = async (id) => {
-    try{
-        const category = await categoryRepository.findOne({_id: id});
+    try {
+        const category = await categoryRepository.findOne({ _id: id });
         return {
             message: "Get data successfully",
             statusCode: 1,
             content: category
         }
-    }catch(error) {
+    } catch (error) {
         return {
             statusCode: 0,
             message: "System error!"
