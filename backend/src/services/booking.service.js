@@ -189,9 +189,26 @@ const CheckUnusedBooking = async (slot) => {
         console.error(err);
     }
 }
+
+const updateBookingWhenFacilityDelete = async (facilityId) => {
+    try {
+        const updateResult = await Booking.updateMany(
+            {
+                'startDate': { $gte: new Date() },
+                'status': 1, // Phần này cần nằm trong object của điều kiện tìm kiếm
+                'facilityId': facilityId // Phần này cần nằm trong object của điều kiện tìm kiếm
+            },
+            { $set: { 'status': 4, reason: "Cơ sở vật chất ngừng hoạt động" } }
+        );
+
+        return updateResult;
+    } catch (err) {
+        console.error(err);
+    }
+}
 export default {
     create, Dashboard, DashboardWeek,
     update, FindAll, deleteOne, detail, statusBooking, FindBoookinUser,
 
-    CheckExpireBooking, CheckUnusedBooking
+    CheckExpireBooking, CheckUnusedBooking, updateBookingWhenFacilityDelete
 }

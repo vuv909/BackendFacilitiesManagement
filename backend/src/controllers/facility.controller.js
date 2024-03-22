@@ -25,10 +25,10 @@ const update = async (req, res) => {
     }
 }
 
-const remove = async (req, res) => {
+const changeStatus = async (req, res) => {
 	const { id } = req.query;
     try{
-        const result = await facilityService.remove(id);
+        const result = await facilityService.changeStatus(id);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     }catch(error){
@@ -52,14 +52,16 @@ const listPagination = async (req, res) => {
     const size = parseInt(req.query.size) || 5;
     const name = req.query.name || '';
     const category = req.query.categoryId || '';
+    const status = req.query.status || '';
     try{
-        const result = await facilityService.listPagination(page, size, name, category);
+        const result = await facilityService.listPagination(page, size, name, category, status);
         const statusCode = result.statusCode == 1 ? 200 : 500;
         return res.status(statusCode).json(result);
     }catch(error){
         return res.status(500).json(error);
     }
 }
+
 
 const listDashboard = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -89,9 +91,9 @@ const getListFacilityByCategory = async(req, res) => {
 export default {
     create,
     update,
-    remove,
+    changeStatus,
     detail,
     listPagination,
     listDashboard,
-    getListFacilityByCategory
+    getListFacilityByCategory,
 }

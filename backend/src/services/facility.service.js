@@ -4,7 +4,7 @@ import Category from "../models/Category.js";
 import Comment from "../models/Comment.js";
 import Facility from "../models/Facility.js"
 import facilityRepository from "../repositories/facility.repository.js";
-import { categoryService, fileService, logService } from "../services/index.js"
+import { bookingService, categoryService, fileService, logService } from "../services/index.js"
 import deepCopy from "../utils/index.js";
 
 const create = async (data) => {
@@ -50,6 +50,12 @@ const update = async (data, actionUser) => {
                 message: "Facility not existed"
             }
         }
+        if(existedFacility.status == 0){
+            return {
+                statusCode: 0,
+                message: "Facility is deleted" 
+            }
+        }
         const existedName = await Facility.findOne({ name: facility.name });
         if (existedName && !existedName._id.equals(existedFacility._id)) {
             return {
@@ -64,7 +70,7 @@ const update = async (data, actionUser) => {
         existedFacility.name = facility.name;
         existedFacility.description = facility.description;
         existedFacility.location = facility.location;
-        existedFacility.status = facility.status;
+        existedFacility.status = facility.status ? facility.status : existedFacility.status;
         existedFacility.category = facility.category;
         existedFacility.image = facility.image ? facility.image : existedFacility.image;
         await existedFacility.save();
@@ -84,15 +90,19 @@ const update = async (data, actionUser) => {
     }
 }
 
-const remove = async (id) => {
+const changeStatus = async (id) => {
     try {
-        const facilityDelete = await Facility.findByIdAndDelete(id);
+        const facilityDelete = await Facility.findById(id);
         if (!facilityDelete) {
             return {
                 statusCode: 0,
                 message: "Not found record"
             }
         }
+        facilityDelete.status = 0;
+        await facilityDelete.save();
+        const result = await bookingService.updateBookingWhenFacilityDelete(id);
+        console.log(result);
         return {
             statusCode: 1,
             message: "Remove successfully",
@@ -115,6 +125,12 @@ const detail = async (id) => {
                 message: "Not found record"
             }
         }
+        if(facility.status == 0){
+            return {
+                statusCode: 0,
+                message: "Facility is deleted"
+            }
+        }
         return {
             statusCode: 1,
             message: "Get data successfully",
@@ -128,10 +144,13 @@ const detail = async (id) => {
     }
 }
 
-const listPagination = async (page, size, name, categoryId) => {
+const listPagination = async (page, size, name, categoryId, status) => {
     const startIndex = (page - 1) * size;
     const category = await categoryService.findOne(categoryId);
     const query = { name: { $regex: name, $options: 'i' } };
+    if(status != null && status != undefined && status != ""){
+        query.status = status;
+    }
     if (category.statusCode == 1) {
         query.category = categoryId;
     }
@@ -153,11 +172,35 @@ const listPagination = async (page, size, name, categoryId) => {
     }
 }
 
+const listPaginationActive = async (page, size, name, categoryId) => {
+    const startIndex = (page - 1) * size;
+    const category = await categoryService.findOne(categoryId);
+    const query = { name: { $regex: name, $options: 'i' }, status: 1 };
+    if (category.statusCode == 1) {
+        query.category = categoryId;
+    }
+    try {
+        const listFacility = await facilityRepository.findPagination(startIndex, size, query);
+        return {
+            statusCode: 1,
+            message: "Get data successfully",
+            items: listFacility.items,
+            totalPage: Math.ceil(listFacility.total / size),
+            activePage: page
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            statusCode: 0,
+            message: "System error"
+        }
+    }
+}
 
 const listDashboard = async (page, size, name, categoryId, sort) => {
     const startIndex = (page - 1) * size;
     const category = await categoryService.findOne(categoryId);
-    const query = { name: { $regex: name, $options: 'i' } };
+    const query = { name: { $regex: name, $options: 'i' }, status: 1};
     if (category.statusCode == 1) {
         query.category = categoryId;
     }
@@ -239,9 +282,10 @@ const getFacilityByCategory = async () => {
 export default {
     create,
     update,
-    remove,
+    changeStatus,
     detail,
     listPagination,
     listDashboard,
-    getFacilityByCategory
+    getFacilityByCategory,
+    listPaginationActive
 }
