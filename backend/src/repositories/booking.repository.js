@@ -307,7 +307,7 @@ const UpdateOne = async (req) => {
 
         // kiểm tra cái ô này trước
         req.body.status = checkUnused(startDate) ? 5 : 2;
-
+        // cập nhật những booking khác là 3 
         const { facilityId, slot } = req.body
         await Booking.updateMany({ facilityId: facilityId, slot: slot, _id: { $ne: id } }, { $set: { status: 3 } });
     }
@@ -333,6 +333,80 @@ const DeleteOne = async (req) => {
     const existedUser = await Booking.deleteOne({ _id: id }).exec();
     return existedUser;
 }
+// const CreateOne = async (req) => {
+//     const { booker, facilityId, weeks, weekdays, slot, status, startDate, endDate } = req.body;
+
+//     const checkSameBooking = await checkBooking({
+//         booker: booker,
+//         facilityId: facilityId,
+//         weeks: weeks,
+//         weekdays: weekdays,
+//         slot: slot,
+//         status: status
+//     });
+//     let dateSlot = {};
+//     let startDate2 = '';
+//     let endDate2 = '';
+//     if (checkSameBooking === 'found') {
+//         return checkSameBooking;
+//     }
+//     if (slot == 'Slot1') {
+//         startDate2 = STARTDATE_SLOT1;
+//         endDate2 = ENDDATE_SLOT1;
+//     }
+//     else if (slot == 'Slot2') {
+//         startDate2 = STARTDATE_SLOT2;
+//         endDate2 = ENDDATE_SLOT2;
+//     }
+//     else if (slot == 'Slot3') {
+//         startDate2 = STARTDATE_SLOT3;
+//         endDate2 = ENDDATE_SLOT3;
+//     }
+//     else if (slot == 'Slot4') {
+//         startDate2 = STARTDATE_SLOT4;
+//         endDate2 = ENDDATE_SLOT4;
+//     }
+//     else if (slot == 'Slot5') {
+//         startDate2 = STARTDATE_SLOT5;
+//         endDate2 = ENDDATE_SLOT5;
+//     }
+//     else if (slot == 'Slot6') {
+//         startDate2 = STARTDATE_SLOT6;
+//         endDate2 = ENDDATE_SLOT6;
+//     }
+//     else if (slot == 'Slot7') {
+//         startDate2 = STARTDATE_SLOT7;
+//         endDate2 = ENDDATE_SLOT7;
+//     }
+//     else if (slot == 'Slot8') {
+//         startDate2 = STARTDATE_SLOT8;
+//         endDate2 = ENDDATE_SLOT8;
+//     }
+//     else if (slot == 'Slot9') {
+//         startDate2 = STARTDATE_SLOT9;
+//         endDate2 = ENDDATE_SLOT9;
+//     }
+//     const startTimeString = startDate + startDate2;
+//     const endTimeString = endDate + endDate2;
+//     let start = new Date(startTimeString);
+//     let end = new Date(endTimeString);
+//     dateSlot = {
+//         startDate: start,
+//         endDate: end
+//     }
+
+//     const existedUser = await Booking.create({ ...req.body, ...dateSlot });
+//     const user = await User.findById(booker);
+//     const facility = await Facility.findById(facilityId);
+//     const notification = {
+//         content: `${user.name} đã đặt phòng: ${facility.name}`,
+//         path: '/dashboard',
+//         name: user.name
+//     }
+//     await notificationService.sendNotificationToAdmin(notification);
+//     return existedUser;
+// }
+
 const CreateOne = async (req) => {
     const { booker, facilityId, weeks, weekdays, slot, status, startDate, endDate } = req.body;
 
@@ -358,10 +432,6 @@ const CreateOne = async (req) => {
         startDate2 = STARTDATE_SLOT2;
         endDate2 = ENDDATE_SLOT2;
     }
-    else if (slot == 'Slot3') {
-        startDate2 = STARTDATE_SLOT3;
-        endDate2 = ENDDATE_SLOT3;
-    }
     else if (slot == 'Slot4') {
         startDate2 = STARTDATE_SLOT4;
         endDate2 = ENDDATE_SLOT4;
@@ -386,17 +456,22 @@ const CreateOne = async (req) => {
         startDate2 = STARTDATE_SLOT9;
         endDate2 = ENDDATE_SLOT9;
     }
-    const startTimeString = startDate + startDate2;
-    const endTimeString = endDate + endDate2;
-    // console.log(startTimeString);
-    let start = new Date(startTimeString);
-    let end = new Date(endTimeString);
-    // console.log(start);
-    // console.log(end);
+    // Các trường hợp khác cho các slot
+
+    const startTime = new Date(startDate); // Thời gian bắt đầu từ `startDate`
+    const endTime = new Date(endDate); // Thời gian kết thúc từ `endDate`
+
+    // Thêm giờ bắt đầu của slot
+    startTime.setHours(startTime.getHours() + startDate2.getHours());
+    startTime.setMinutes(startTime.getMinutes() + startDate2.getMinutes());
+
+    // Thêm giờ kết thúc của slot
+    endTime.setHours(endTime.getHours() + endDate2.getHours());
+    endTime.setMinutes(endTime.getMinutes() + endDate2.getMinutes());
 
     dateSlot = {
-        startDate: start,
-        endDate: end
+        startDate: startTime,
+        endDate: endTime
     }
 
     const existedUser = await Booking.create({ ...req.body, ...dateSlot });
@@ -407,10 +482,10 @@ const CreateOne = async (req) => {
         path: '/dashboard',
         name: user.name
     }
-    console.log("Notification: ", notification);
     await notificationService.sendNotificationToAdmin(notification);
     return existedUser;
 }
+
 /*
     Tên hàm: dashboard theo năm, hoặc theo tháng của booking
         Tham số: Year hoặc month 
