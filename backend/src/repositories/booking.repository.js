@@ -214,7 +214,7 @@ const FindBoookingUser = async (req) => {
     }
     const { ObjectId } = Types;
     const { id } = req.params;
-    const { name, weeks } = req.query;
+    const { name, weeks, facilityId } = req.query;
     let query = {};
     if (weeks) {
         query = { weeks: { $regex: weeks, $options: 'i' }, status: { $in: [1, 2, 3] } }
@@ -223,14 +223,18 @@ const FindBoookingUser = async (req) => {
     const size = parseInt(req.query.size) || 5;
     // const { weeks } = req.query
     const startIndex = (page - 1) * size;
-    // const query = { weeks: { $regex: weeks, $options: 'i' } };
-
     const existedUser = await Booking.find(query, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
-
+    console.log(existedUser);
     let arrUser = [];
     for (const item of existedUser) {
-        if (item.booker?._id.equals(new ObjectId(id))) {
-            arrUser.push(item)
+        if (facilityId) {
+            if (item.booker?._id.equals(new ObjectId(id)) && item.facilityId?._id.equals(new ObjectId(facilityId))) {
+                arrUser.push(item)
+            }
+        } else {
+            if (item.booker?._id.equals(new ObjectId(id))) {
+                arrUser.push(item)
+            }
         }
     }
     if (name) {
@@ -276,11 +280,12 @@ const FindBoookingUser = async (req) => {
         }
         arrUser = arrangeSeven;
     }
+    let total = arrUser.length;
     if (!weeks) {
         // Phân trang
         arrUser = arrUser.slice(startIndex, startIndex + size);
     }
-    let total = arrUser.length;
+
     return {
         booking: arrUser, totalPage: Math.ceil(total / size),
         activePage: page
