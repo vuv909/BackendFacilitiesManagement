@@ -163,8 +163,11 @@ const StatusBooking = async (req) => {
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } }).exec();
     for (const day of sevenDay) {
-        let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
+        // let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
         // let day = day.toObject();
+        const momentObj = moment(day?.startDate).subtract(7, "hours");;
+        // Lấy tên ngày tiếng Anh bằng cách sử dụng hàm format
+        const nameDay = momentObj.format("dddd");
 
         if (nameDay === 'Monday') {
             arrangeSeven.Monday.push(day);
@@ -221,7 +224,7 @@ const FindBoookingUser = async (req) => {
     }
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
-    // const { weeks } = req.query
+    console.log(query);
     const startIndex = (page - 1) * size;
     const existedUser = await Booking.find(query, userProjecttion).populate([{ path: 'booker' }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
     console.log(existedUser);
@@ -255,7 +258,9 @@ const FindBoookingUser = async (req) => {
         // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
         // console.log(existedUser);
         for (const day of arrUser) {
-            let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
+            const momentObj = moment(day?.startDate).subtract(7, "hours");;
+            // Lấy tên ngày tiếng Anh bằng cách sử dụng hàm format
+            const nameDay = momentObj.format("dddd");
             if (nameDay === 'Monday') {
                 arrangeSeven.Monday.push(day);
             }
@@ -490,12 +495,6 @@ const Dashboard = async (req) => {
     return bookingYear;
 }
 
-function convertUTCtoLocalDate(UTCDateString, timeZoneOffset) {
-    const date = new Date(UTCDateString);
-    const offset = date.getTimezoneOffset();
-    const localTime = date.getTime() - (offset * 60000) + (timeZoneOffset * 60 * 60000);
-    return new Date(localTime);
-}
 const DashboardWeek = async (req) => {
     // arrange
     // check xem năm trước xem có không hoặc check tháng xem có không
