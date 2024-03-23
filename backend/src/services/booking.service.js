@@ -189,6 +189,22 @@ const CheckUnusedBooking = async (slot) => {
         console.error(err);
     }
 }
+const updateBookingWhenFacilityDelete = async (facilityId) => {
+    try {
+        const updateResult = await Booking.updateMany(
+            {
+                'startDate': { $gte: new Date() },
+                'status': 1, // Phần này cần nằm trong object của điều kiện tìm kiếm
+                'facilityId': facilityId // Phần này cần nằm trong object của điều kiện tìm kiếm
+            },
+            { $set: { 'status': 4, reason: "Cơ sở vật chất ngừng hoạt động" } }
+        );
+
+        return updateResult;
+    } catch (err) {
+        console.error(err);
+    }
+}
 /*
 Tên hàm: lúc 12 h kiểm tra các booking nào là 5 mà đã quá ngày thì cho về là 2 
 người tạo: Đặng Đình Quốc Khánh
@@ -199,7 +215,8 @@ const checkBookingExpire5 = async () => {
             { 'startDate': { $lte: new Date() }, "status": 5 },
             { $set: { 'status': 2 } },
         );
-        return updateResult;
+
+
     } catch (err) {
         console.error(err);
     }
@@ -208,5 +225,5 @@ export default {
     create, Dashboard, DashboardWeek,
     update, FindAll, deleteOne, detail, statusBooking, FindBoookinUser,
 
-    CheckExpireBooking, CheckUnusedBooking, checkBookingExpire5
+    CheckExpireBooking, CheckUnusedBooking, checkBookingExpire5, updateBookingWhenFacilityDelete
 }
