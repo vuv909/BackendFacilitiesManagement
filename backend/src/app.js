@@ -90,34 +90,40 @@ socketIo.on('connection', (socket) => {
     });
 });
 
-// Hàm kiểm tra xem thời gian hiện tại có nằm trong một time slot không
-function isInTimeSlot(slot) {
-    const currentTime = new Date();
-    const startTime = new Date(slot.startTime);
-    const endTime = new Date(slot.endTime);
-    return currentTime >= startTime && currentTime <= endTime;
-}
 // cron job for run every day at 00:00
 cron.schedule('* * * * *', async () => {
     console.log("Start clean booking expried!!!");
     await bookingService.CheckExpireBooking();
+    await bookingService.checkBookingExpire5();
 
 })
 // Cấu hình cron job để chạy vào mỗi ngày lúc 09:00:00 và các thời điểm khác theo yêu cầu
 cron.schedule('30 7 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot1');
 });
-cron.schedule('50 10 * * *', async () => {
+cron.schedule('10 9 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot2');
 });
-cron.schedule('50 12 * * *', async () => {
+cron.schedule('50 10 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot3');
 });
-cron.schedule('30 15 * * *', async () => {
+cron.schedule('50 12 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot4');
 });
-cron.schedule('40 17 * * *', async () => {
+cron.schedule('30 14 * * *', async () => {
     await bookingService.CheckUnusedBooking('Slot5');
+});
+cron.schedule('10 16 * * *', async () => {
+    await bookingService.CheckUnusedBooking('Slot6');
+});
+cron.schedule('50 17 * * *', async () => {
+    await bookingService.CheckUnusedBooking('Slot7');
+});
+cron.schedule('30 19 * * *', async () => {
+    await bookingService.CheckUnusedBooking('Slot8');
+});
+cron.schedule('10 21 * * *', async () => {
+    await bookingService.CheckUnusedBooking('Slot9');
 });
 // handling catch error
 

@@ -495,12 +495,6 @@ const Dashboard = async (req) => {
     return bookingYear;
 }
 
-function convertUTCtoLocalDate(UTCDateString, timeZoneOffset) {
-    const date = new Date(UTCDateString);
-    const offset = date.getTimezoneOffset();
-    const localTime = date.getTime() - (offset * 60000) + (timeZoneOffset * 60 * 60000);
-    return new Date(localTime);
-}
 const DashboardWeek = async (req) => {
     // arrange
     // check xem năm trước xem có không hoặc check tháng xem có không
