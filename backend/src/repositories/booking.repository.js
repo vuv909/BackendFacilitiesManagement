@@ -77,7 +77,9 @@ const FindAll = async (req) => {
         // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
         // console.log(existedUser);
         for (const day of existedUser) {
-            let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
+            const momentObj = moment(day?.startDate).subtract(7, "hours");;
+            // Lấy tên ngày tiếng Anh bằng cách sử dụng hàm format
+            const nameDay = momentObj.format("dddd");
             if (nameDay === 'Monday') {
                 arrangeSeven.Monday.push(day);
             }
