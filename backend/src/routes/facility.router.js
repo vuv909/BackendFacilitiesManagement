@@ -32,7 +32,7 @@ facilityRouter.put("/update",
         validator.checkError
     ],
     facilityController.update);
-facilityRouter.delete("/delete", [authJWT.verifyToken, authJWT.checkRole("Admin")], facilityController.changeStatus);
+facilityRouter.put("/changeStatus", [authJWT.verifyToken, authJWT.checkRole("Admin")], facilityController.changeStatus);
 facilityRouter.get("/stastic-by-category", [authJWT.verifyToken], facilityController.getListFacilityByCategory);
  
 export default facilityRouter;

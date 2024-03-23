@@ -104,10 +104,9 @@ const changeStatus = async (id) => {
         if (facilityDelete.status == 0) {
             await bookingService.updateBookingWhenFacilityDelete(id);
         }
-        console.log(result);
         return {
             statusCode: 1,
-            message: "Remove successfully",
+            message: "Update status successfully",
             data: facilityDelete
         }
     } catch (error) {
