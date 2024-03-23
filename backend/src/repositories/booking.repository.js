@@ -7,6 +7,7 @@ import Facility from '../models/Facility.js';
 import { notificationService } from '../services/index.js';
 import Notification from '../models/Notification.js';
 import { ObjectId } from 'mongoose';
+import moment from 'moment';
 const FindAll = async (req) => {
 
     const userProjecttion = {
@@ -40,7 +41,6 @@ const FindAll = async (req) => {
     let existedUser = await Booking.find(query)
         .populate({
             path: 'booker',
-            select: userProjecttion,
             populate: {
                 path: 'roleId',
                 select: userProjecttion,
@@ -77,7 +77,9 @@ const FindAll = async (req) => {
         // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
         // console.log(existedUser);
         for (const day of existedUser) {
-            let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
+            const momentObj = moment(day?.startDate).subtract(7, "hours");;
+            // Lấy tên ngày tiếng Anh bằng cách sử dụng hàm format
+            const nameDay = momentObj.format("dddd");
             if (nameDay === 'Monday') {
                 arrangeSeven.Monday.push(day);
             }
@@ -158,13 +160,16 @@ const StatusBooking = async (req) => {
         Saturday: [],
         Sunday: [],
     }
-    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] }, userProjecttion)
+    const sevenDay = await Booking.find({ $and: [{ startDate: { $gte: today, $lte: oneWeekFromToday } }, query, { facilityId: id }] })
         .populate({ path: 'booker', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } })
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion, populate: { path: 'roleId', select: userProjecttion } }).exec();
     for (const day of sevenDay) {
-        let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
+        // let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
         // let day = day.toObject();
+        const momentObj = moment(day?.startDate).subtract(7, "hours");;
+        // Lấy tên ngày tiếng Anh bằng cách sử dụng hàm format
+        const nameDay = momentObj.format("dddd");
 
         if (nameDay === 'Monday') {
             arrangeSeven.Monday.push(day);
@@ -203,7 +208,7 @@ const FindBooking = async (req) => {
     const size = parseInt(req.query.size) || 5;
     // const { weeks } = req.query
     const startIndex = (page - 1) * size;
-    const existedUser = await Booking.findById(id, userProjecttion).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
+    const existedUser = await Booking.findById(id).populate({ path: 'booker', select: userProjecttion }).populate({ path: 'facilityId', select: userProjecttion }).populate({ path: 'handler', select: userProjecttion }).exec();
     return existedUser;
 }
 const FindBoookingUser = async (req) => {
@@ -221,9 +226,9 @@ const FindBoookingUser = async (req) => {
     }
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
-    // const { weeks } = req.query
+    console.log(query);
     const startIndex = (page - 1) * size;
-    const existedUser = await Booking.find(query, userProjecttion).populate([{ path: 'booker', select: userProjecttion }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
+    const existedUser = await Booking.find(query, userProjecttion).populate([{ path: 'booker' }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
     console.log(existedUser);
     let arrUser = [];
     for (const item of existedUser) {
@@ -255,7 +260,9 @@ const FindBoookingUser = async (req) => {
         // Chuyển đổi các đối tượng Mongoose thành đối tượng JavaScript thuần túy
         // console.log(existedUser);
         for (const day of arrUser) {
-            let nameDay = day?.startDate?.toLocaleDateString("en-US", { weekday: "long" });
+            const momentObj = moment(day?.startDate).subtract(7, "hours");;
+            // Lấy tên ngày tiếng Anh bằng cách sử dụng hàm format
+            const nameDay = momentObj.format("dddd");
             if (nameDay === 'Monday') {
                 arrangeSeven.Monday.push(day);
             }
@@ -395,6 +402,8 @@ const CreateOne = async (req) => {
     const endTimeString = endDate + endDate2;
     let start = new Date(startTimeString);
     let end = new Date(endTimeString);
+    console.log(start);
+    console.log(end);
     dateSlot = {
         startDate: start,
         endDate: end
@@ -411,86 +420,6 @@ const CreateOne = async (req) => {
     await notificationService.sendNotificationToAdmin(notification);
     return existedUser;
 }
-
-// const CreateOne = async (req) => {
-//     const { booker, facilityId, weeks, weekdays, slot, status, startDate, endDate } = req.body;
-
-//     const checkSameBooking = await checkBooking({
-//         booker: booker,
-//         facilityId: facilityId,
-//         weeks: weeks,
-//         weekdays: weekdays,
-//         slot: slot,
-//         status: status
-//     });
-//     let dateSlot = {};
-//     let startDate2 = '';
-//     let endDate2 = '';
-//     if (checkSameBooking === 'found') {
-//         return checkSameBooking;
-//     }
-//     if (slot == 'Slot1') {
-//         startDate2 = STARTDATE_SLOT1;
-//         endDate2 = ENDDATE_SLOT1;
-//     }
-//     else if (slot == 'Slot2') {
-//         startDate2 = STARTDATE_SLOT2;
-//         endDate2 = ENDDATE_SLOT2;
-//     }
-//     else if (slot == 'Slot4') {
-//         startDate2 = STARTDATE_SLOT4;
-//         endDate2 = ENDDATE_SLOT4;
-//     }
-//     else if (slot == 'Slot5') {
-//         startDate2 = STARTDATE_SLOT5;
-//         endDate2 = ENDDATE_SLOT5;
-//     }
-//     else if (slot == 'Slot6') {
-//         startDate2 = STARTDATE_SLOT6;
-//         endDate2 = ENDDATE_SLOT6;
-//     }
-//     else if (slot == 'Slot7') {
-//         startDate2 = STARTDATE_SLOT7;
-//         endDate2 = ENDDATE_SLOT7;
-//     }
-//     else if (slot == 'Slot8') {
-//         startDate2 = STARTDATE_SLOT8;
-//         endDate2 = ENDDATE_SLOT8;
-//     }
-//     else if (slot == 'Slot9') {
-//         startDate2 = STARTDATE_SLOT9;
-//         endDate2 = ENDDATE_SLOT9;
-//     }
-//     // Các trường hợp khác cho các slot
-
-//     const startTime = new Date(startDate); // Thời gian bắt đầu từ `startDate`
-//     const endTime = new Date(endDate); // Thời gian kết thúc từ `endDate`
-
-//     // Thêm giờ bắt đầu của slot
-//     startTime.setHours(startTime.getHours() + startDate2.getHours());
-//     startTime.setMinutes(startTime.getMinutes() + startDate2.getMinutes());
-
-//     // Thêm giờ kết thúc của slot
-//     endTime.setHours(endTime.getHours() + endDate2.getHours());
-//     endTime.setMinutes(endTime.getMinutes() + endDate2.getMinutes());
-
-//     dateSlot = {
-//         startDate: startTime,
-//         endDate: endTime
-//     }
-
-//     const existedUser = await Booking.create({ ...req.body, ...dateSlot });
-//     const user = await User.findById(booker);
-//     const facility = await Facility.findById(facilityId);
-//     const notification = {
-//         content: `${user.name} đã đặt phòng: ${facility.name}`,
-//         path: '/dashboard',
-//         name: user.name
-//     }
-//     await notificationService.sendNotificationToAdmin(notification);
-//     return existedUser;
-// }
-
 /*
     Tên hàm: dashboard theo năm, hoặc theo tháng của booking
         Tham số: Year hoặc month 
@@ -511,8 +440,6 @@ const Dashboard = async (req) => {
             '$lt': new Date(dateTarget)
         }
     };
-    console.log(query);
-    console.log(yearTarget);
     if (status) {
         query = { ...query, status: status };
     }
@@ -520,7 +447,6 @@ const Dashboard = async (req) => {
 
     // sau đó tạo mảng chứa 12 tháng
     let bookingYear = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    console.log('hello');
     for (const book of books) {
         var dateObject = new Date(book?.createdAt);
 
@@ -570,38 +496,55 @@ const Dashboard = async (req) => {
     // gán từng tháng theo status của năm 
     return bookingYear;
 }
+
 const DashboardWeek = async (req) => {
     // arrange
     // check xem năm trước xem có không hoặc check tháng xem có không
-    const { year, month, status } = req.query;
-    const targetYear = parseInt(year); // Chuyển đổi year thành số nguyên
-    const targetMonth = parseInt(month); // Chuyển đổi month thành số nguyên
+    const { startDate, endDate, status } = req.query;
 
-    // Tạo ngày bắt đầu của tháng và kết thúc của tháng
-    const startDate = new Date(targetYear, targetMonth - 1, 1); // Ngày bắt đầu của tháng
-    const endDate = new Date(targetYear, targetMonth, 0); // Ngày cuối cùng của tháng
-
-    // Đặt giờ, phút, giây và miligiây để kết thúc ngày là 23:59:59.999
-    endDate.setUTCHours(23, 59, 59, 999);
-
-    // Truy vấn MongoDB
-    let books = await Booking.find({
+    let query = {
         "createdAt": {
-            $gte: startDate, // Bắt đầu từ ngày đầu tiên của tháng
-            $lte: endDate // Kết thúc vào ngày cuối cùng của tháng
-        },
-        status: status
-    }).exec();
+            '$gte': new Date(startDate),
+            '$lt': new Date(endDate)
+        }
+    };
+    if (status) {
+        query = { ...query, status: status };
+    }
+    console.log(query);
+    // Truy vấn MongoDB
+    let books = await Booking.find(query).exec();
 
-    // sau đó tạo mảng chứa 12 tháng
-    let bookingYear = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    console.log('hello');
-    for (const book of books) {
-        var dateObject = new Date(book?.createdAt);
-
+    // sau đó tạo mảng chứa 77 ngày
+    let bookingYear = [0, 0, 0, 0, 0, 0, 0];
+    for (const day of books) {
+        // Chuyển đổi chuỗi sang đối tượng Date
+        // Chuyển đổi chuỗi sang đối tượng Moment
+        const momentObj = moment(day?.createdAt).subtract(7, "hours");;
+        // Lấy tên ngày tiếng Anh bằng cách sử dụng hàm format
+        const nameDay = momentObj.format("dddd");
+        if (nameDay === 'Monday') {
+            bookingYear[0]++;
+        }
+        else if (nameDay === 'Tuesday') {
+            bookingYear[1]++;
+        }
+        else if (nameDay === 'Wednesday') {
+            bookingYear[2]++;
+        }
+        else if (nameDay === 'Thursday') {
+            bookingYear[3]++;
+        }
+        else if (nameDay === 'Friday') {
+            bookingYear[4]++;
+        }
+        else if (nameDay === 'Saturday') {
+            bookingYear[5]++;
+        }
+        else if (nameDay === 'Sunday') {
+            bookingYear[6]++;
+        }
         // Lấy tháng từ đối tượng Date
-
-
     }
     // gán từng tháng theo status của năm 
     return bookingYear;
