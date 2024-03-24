@@ -38,6 +38,14 @@ const BookingSchema = new Schema(
         reason: {
             type: String,
         },
+        timeAccept: {
+            type: Date,
+            required: false,
+        },
+        timeReject: {
+            type: Date,
+            required: false,
+        },
         status: {
             type: Number,
             required: false,
