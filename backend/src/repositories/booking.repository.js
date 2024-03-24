@@ -226,7 +226,7 @@ const FindBoookingUser = async (req) => {
     const { name, weeks, facilityId } = req.query;
     let query = {};
     if (weeks) {
-        query = { weeks: { $regex: weeks, $options: 'i' }, status: { $in: [1, 2, 3] } }
+        query = { weeks: { $regex: weeks, $options: 'i' }, status: { $in: [1, 2, 3 , 4 , 5] } }
     }
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
