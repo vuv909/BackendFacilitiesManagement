@@ -197,7 +197,7 @@ const updateBookingWhenFacilityDelete = async (facilityId) => {
                 'status': 1, // Phần này cần nằm trong object của điều kiện tìm kiếm
                 'facilityId': facilityId // Phần này cần nằm trong object của điều kiện tìm kiếm
             },
-            { $set: { 'status': 4, reason: "Cơ sở vật chất ngừng hoạt động" } }
+            { $set: { 'status': 3, reason: "Cơ sở vật chất ngừng hoạt động" } }
         );
 
         return updateResult;
