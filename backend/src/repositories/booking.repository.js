@@ -232,8 +232,7 @@ const FindBoookingUser = async (req) => {
     const size = parseInt(req.query.size) || 5;
     console.log(query);
     const startIndex = (page - 1) * size;
-    const existedUser = await Booking.find(query).populate([{ path: 'booker' }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
-    console.log(existedUser);
+    const existedUser = await Booking.find(query).sort({ createdAt: -1 }).populate([{ path: 'booker' }, { path: 'facilityId', select: userProjecttion }, { path: 'handler', select: userProjecttion }]).exec();
     let arrUser = [];
     for (const item of existedUser) {
         if (facilityId) {
