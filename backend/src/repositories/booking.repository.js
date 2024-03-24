@@ -411,8 +411,6 @@ const CreateOne = async (req) => {
     const endTimeString = endDate + endDate2;
     let start = new Date(startTimeString);
     let end = new Date(endTimeString);
-    console.log(start);
-    console.log(end);
     dateSlot = {
         startDate: start,
         endDate: end
