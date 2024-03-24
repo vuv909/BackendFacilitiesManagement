@@ -17,7 +17,7 @@ const FindAll = async (req) => {
     }
     // Xử lý thông tin sort
     let sortOptions = {};
-    const { sort, role, status, weeks, name } = req.query;
+    const { sort, role, status, weeks, name, sortBeside } = req.query;
     if (sort) {
         const sortFields = Array.isArray(sort) ? sort : [sort];
         sortFields.forEach(sortField => {
@@ -25,6 +25,8 @@ const FindAll = async (req) => {
             sortOptions[field] = (order === 'asc' ? 1 : -1);
         });
     }
+    console.log(sort);
+    console.log(sortOptions);
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
     const startIndex = (page - 1) * size;
@@ -33,12 +35,11 @@ const FindAll = async (req) => {
     if (weeks) {
         query = { weeks: { $regex: weeks, $options: 'i' }, status: 2 }
     }
-    console.log({ "_id": role });
     if (status) {
         query = { ...query, status: status };
     }
-
-    let existedUser = await Booking.find(query)
+    // return await Booking.find({ status: 2 }).sort({ createdAt: -1 });
+    let existedUser = await Booking.find(query).sort(sortOptions)
         .populate({
             path: 'booker',
             populate: {
@@ -48,8 +49,9 @@ const FindAll = async (req) => {
         })
         .populate({ path: 'facilityId', select: userProjecttion })
         .populate({ path: 'handler', select: userProjecttion })
-        .sort(sortOptions)
+
         .exec();
+    console.log(existedUser);
     let arrangeSeven = [];
 
     let total = await Booking.countDocuments(query);
@@ -108,18 +110,20 @@ const FindAll = async (req) => {
         // Tính tổng số lượng dữ liệu sau khi lọc
         const { ObjectId } = Types;
         total = existedUser.length;
-        existedUser.sort((a, b) => {
-            const classIdA = a?.facilityId?.toString();
-            const classIdB = b?.facilityId?.toString();
+        if (sortBeside) {
+            existedUser.sort((a, b) => {
+                const classIdA = a?.facilityId?.toString();
+                const classIdB = b?.facilityId?.toString();
 
-            // Sort by classId first
-            if (classIdA !== classIdB) {
-                return classIdA?.localeCompare(classIdB);
-            } else {
-                // If classIds are the same, sort by slot
-                return a?.slot?.localeCompare(b.slot);
-            }
-        });
+                // Sort by classId first
+                if (classIdA !== classIdB) {
+                    return classIdA?.localeCompare(classIdB);
+                } else {
+                    // If classIds are the same, sort by slot
+                    return a?.slot?.localeCompare(b.slot);
+                }
+            });
+        }
 
         // Áp dụng phân trang
         existedUser = existedUser.slice(startIndex, startIndex + size);
@@ -313,15 +317,20 @@ const UpdateOne = async (req) => {
     const userId = req.userID;
     req.body.handler = userId;
 
+    const currentMoment = moment(); // Lấy thời điểm hiện tại
+    const momentMinus7Hours = currentMoment.add(7, 'hours'); // Trừ đi 7 giờ từ thời điểm hiện tại
+
     if (req.body.status === 2) {
         const { startDate } = req.body;
-
-
+        req.body.timeAccept = momentMinus7Hours;
         // kiểm tra cái ô này trước
         req.body.status = checkUnused(startDate) ? 5 : 2;
         // cập nhật những booking khác là 3 
         const { facilityId, slot } = req.body
         await Booking.updateMany({ facilityId: facilityId, slot: slot, _id: { $ne: id } }, { $set: { status: 3 } });
+    }
+    else if (req.body.status === 3) {
+        req.body.timeReject = momentMinus7Hours;
     }
     const existedUser = await Booking.findByIdAndUpdate(id, req.body, { new: true }).exec();
     const message = req.body.status === 2 ? "Yêu cầu của bạn đã được phê duyệt" : "Yêu cầu của bạn đã bị từ chối";
