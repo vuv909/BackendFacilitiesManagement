@@ -36,7 +36,18 @@ const FindAll = async (req) => {
         query = { weeks: { $regex: weeks, $options: 'i' }, status: 2 }
     }
     if (status) {
-        query = { ...query, status: status };
+        console.log('====================================');
+        console.log(status);
+        console.log('====================================');
+        if(status == 2){
+            query = { ...query, status: { $in: [ 2, 5] } };
+            console.log('====================================');
+            console.log(query);
+            console.log('====================================');
+        }else{
+
+            query = { ...query, status: status };
+        }
     }
     // return await Booking.find({ status: 2 }).sort({ createdAt: -1 });
     let existedUser = await Booking.find(query).sort(sortOptions)
@@ -51,7 +62,9 @@ const FindAll = async (req) => {
         .populate({ path: 'handler', select: userProjecttion })
 
         .exec();
-    console.log(existedUser);
+        console.log('====================================');
+        console.log(existedUser);
+        console.log('====================================');
     let arrangeSeven = [];
 
     let total = await Booking.countDocuments(query);
